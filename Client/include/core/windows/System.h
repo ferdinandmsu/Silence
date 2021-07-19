@@ -19,13 +19,7 @@ namespace silence
 {
     namespace impl
     {
-        inline std::string username()
-        {
-            char usernameBuffer[UNLEN + 1];
-            DWORD usernameLen = UNLEN + 1;
-            GetUserName(usernameBuffer, &usernameLen);
-            return std::string(usernameBuffer);
-        }
+        std::string username();
     }
 }
 

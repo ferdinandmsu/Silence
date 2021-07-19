@@ -22,27 +22,11 @@ namespace silence
             XImage *img{nullptr};
 
         public:
-            Screenshot()
-            {
-                display = XOpenDisplay(nullptr);
-                root = DefaultRootWindow(display);
-            }
-
-            ~Screenshot()
-            {
-                if (img != nullptr)
-                    XDestroyImage(img);
-                XCloseDisplay(display);
-            }
+            Screenshot();
+            ~Screenshot();
 
         public:
-            cv::Mat take()
-            {
-                if (img != nullptr)
-                    XDestroyImage(img);
-                img = XGetImage(display, root, x, y, width, height, AllPlanes, ZPixmap);
-                return cv::Mat(height, width, CV_8UC4, img->data);
-            }
+            cv::Mat take();
         };
 
     }

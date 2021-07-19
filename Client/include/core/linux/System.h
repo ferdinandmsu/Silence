@@ -15,10 +15,7 @@ namespace silence
 {
     namespace impl
     {
-        inline std::string username()
-        {
-            return std::string(getlogin());
-        }
+        std::string username();
     }
 }
 
