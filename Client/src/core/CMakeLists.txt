@@ -19,5 +19,5 @@ target_include_directories(silence_ioclient PUBLIC
 
 target_link_libraries(silence_ioclient 
                       silence_utility
-                      sioclient_tls
+                      sioclient
                       ${CONAN_LIBS})

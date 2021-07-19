@@ -18,7 +18,7 @@ namespace silence
 
             int height, width, srcheight, srcwidth;
             HBITMAP hbwindow;
-            Mat src;
+            cv::Mat src;
             BITMAPINFOHEADER bi;
 
             hwindowDC = GetDC(hwndDesktop);

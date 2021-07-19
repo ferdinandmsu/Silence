@@ -4,18 +4,8 @@
 
 int main()
 {
-    silence::impl::Screenshot screen;
-    cv::Mat img;
-
-    while (true)
-    {
-        cv::Mat img = screen.take();
-
-        cv::imshow("img", img);
-        char k = cv::waitKey(1);
-        if (k == 'q')
-            break;
-    }
+    silence::Client client("http://localhost:3000/");
+    client.connect();
 
     return 0;
 }
