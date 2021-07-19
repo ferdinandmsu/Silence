@@ -14,7 +14,6 @@ namespace silence
 
         public:
             Screenshot();
-
             cv::Mat take();
         };
     }

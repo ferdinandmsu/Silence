@@ -1,5 +1,5 @@
-#include <core/windows/System.h>
 #ifdef _WIN32
+#include <core/windows/System.h>
 
 namespace silence
 {

@@ -1,5 +1,5 @@
-#include <core/linux/Screenshot.h>
 #ifdef __linux__
+#include <core/linux/Screenshot.h>
 
 namespace silence
 {

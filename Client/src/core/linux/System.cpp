@@ -1,5 +1,5 @@
-#include <core/linux/System.h>
 #ifdef __linux__
+#include <core/linux/System.h>
 
 namespace silence
 {

@@ -41,6 +41,6 @@ namespace silence
 
         if (command == "screenshot")
         {
-                }
+        }
     }
 }

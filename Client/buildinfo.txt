@@ -1,15 +1,17 @@
 BUILD SILENCE CLIENT:
-    1. open a terminal
-    2. cd into vendor folder
-    3. git clone https://github.com/socketio/socket.io-client-cpp
-    4. git clone https://github.com/opencv/opencv
-    5. cd into opencv
-    6. install opencv dependencies
-    7. mkdir build && cd build
-    8. WINDOWS: cmake ..
-    9. LINUX: cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D WITH_TBB=ON -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_V4L=ON -D INSTALL_C_EXAMPLES=ON -D INSTALL_PYTHON_EXAMPLES=ON -D BUILD_EXAMPLES=ON -D WITH_QT=ON -D WITH_GTK=ON -D WITH_OPENGL=ON ..
-    10. make -j7
-    11. sudo make install
+    1.  open a terminal
+    2.  cd into vendor folder
+    3.  git clone https://github.com/socketio/socket.io-client-cpp
+    4.  git clone https://github.com/opencv/opencv
+    5.  cd into opencv
+    6.  install opencv dependencies
+    7.  mkdir build && cd build
+    8.  WINDOWS: cmake ..
+    9.  LINUX: cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D WITH_TBB=ON -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_V4L=ON -D INSTALL_C_EXAMPLES=ON -D INSTALL_PYTHON_EXAMPLES=ON -D BUILD_EXAMPLES=ON -D WITH_QT=ON -D WITH_GTK=ON -D WITH_OPENGL=ON ..
+    10. WINDOWS: cmake --build .
+    10. LINUX: make -j7
+    11. WINDOWS: add "set(OpenCV_Dir "LIB DIR")" to root cmake file
+    11. LINUX: sudo make install
     12. cd ../../../
     13. mkdir build && cd build
     14. conan install ../conanfile.txt
