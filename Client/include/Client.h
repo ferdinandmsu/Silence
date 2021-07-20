@@ -1,7 +1,6 @@
 #pragma once
 
-#include <core/Util.h>
-#include <core/IOClient.h>
+#include <IOClient.h>
 
 namespace silence
 {
@@ -22,5 +21,8 @@ namespace silence
                        sio::message::ptr const &data,
                        bool hasAck,
                        sio::message::list &ack_resp);
+
+    protected:
+        void screenshotEvent();
     };
 }

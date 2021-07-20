@@ -1,5 +1,8 @@
 #pragma once
 
+#include <chrono>
+#include <thread>
+#include <future>
 #include <filesystem>
 
 #ifdef _WIN32
@@ -21,5 +24,7 @@ namespace silence
         std::vector<fs::path> listdir(const fs::path &path);
 
         std::string hostname();
+
+        std::shared_ptr<std::string> toBinaryString(const cv::Mat &img);
     }
 }

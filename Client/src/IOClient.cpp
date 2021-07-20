@@ -1,4 +1,4 @@
-#include <core/IOClient.h>
+#include <IOClient.h>
 
 #ifdef WINDOWS
 #define BIND_EVENT(IO, EV, FN)             \
@@ -18,6 +18,7 @@ namespace silence
     IOClient::IOClient(const std::string &url)
         : mUrl(url), mIO(new sio::client())
     {
+        mSock = mIO->socket();
     }
 
     IOClient::~IOClient()

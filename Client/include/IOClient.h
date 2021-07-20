@@ -51,5 +51,7 @@ namespace silence
 
         std::condition_variable_any mCond;
         bool connectFinished{false};
+
+        sio::socket::ptr mSock;
     };
 }

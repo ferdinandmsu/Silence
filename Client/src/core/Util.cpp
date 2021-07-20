@@ -35,5 +35,14 @@ namespace silence
             gethostname(hostnameBuffer, 500);
             return std::string(hostnameBuffer);
         }
+
+        std::shared_ptr<std::string> toBinaryString(const cv::Mat &img)
+        {
+            //convert to bytes
+            std::vector<uchar> imageDataVector;
+            cv::imencode(".jpg", img, imageDataVector);
+            return std::make_shared<std::string>(
+                imageDataVector.begin(), imageDataVector.end());
+        }
     }
 }
