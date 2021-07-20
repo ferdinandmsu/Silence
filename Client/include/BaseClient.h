@@ -16,7 +16,7 @@
 
 namespace silence
 {
-    class IOClient
+    class BaseClient
     {
     public:
         using EventFunction = std::function<
@@ -25,8 +25,8 @@ namespace silence
                  bool hasAck,
                  sio::message::list &ack_resp)>;
 
-        IOClient(const std::string &url);
-        ~IOClient();
+        BaseClient(const std::string &url);
+        ~BaseClient();
 
     public:
         void connect();

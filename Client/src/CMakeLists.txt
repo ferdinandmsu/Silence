@@ -2,7 +2,7 @@
 add_subdirectory(${SRC_DIR}/core)
 
 # CLIENT LIBRARY
-add_library(silence_client IOClient.cpp Client.cpp)
+add_library(silence_client BaseClient.cpp Client.cpp)
 
 # PATH INCLUDE
 target_include_directories(silence_client PUBLIC 

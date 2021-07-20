@@ -3,20 +3,20 @@
 namespace silence
 {
     Client::Client(const std::string &url)
-        : IOClient(url)
+        : BaseClient(url)
     {
         // bind events
-        IOClient::bindEvent("command",
-                            std::bind(&Client::onCommand,
-                                      this, std::placeholders::_1,
-                                      std::placeholders::_2,
-                                      std::placeholders::_3, std::placeholders::_4));
+        BaseClient::bindEvent("command",
+                              std::bind(&Client::onCommand,
+                                        this, std::placeholders::_1,
+                                        std::placeholders::_2,
+                                        std::placeholders::_3, std::placeholders::_4));
     }
 
     void Client::onConnected(std::string const &nsp)
     {
         // important
-        IOClient::onConnected(nsp);
+        BaseClient::onConnected(nsp);
     }
 
     void Client::onFailed()

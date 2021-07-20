@@ -1,10 +1,10 @@
 #pragma once
 
-#include <IOClient.h>
+#include <BaseClient.h>
 
 namespace silence
 {
-    class Client : public IOClient
+    class Client : public BaseClient
     {
     public:
         Client(const std::string &url);
