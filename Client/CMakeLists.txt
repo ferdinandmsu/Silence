@@ -6,6 +6,11 @@ project(SilenceClient
         VERSION 1.0.0 
         LANGUAGES CXX)
 
+# WINDOWS
+if (WIN32)
+    add_definitions(-D_ITERATOR_DEBUG_LEVEL=0)
+endif()
+
 # CXX STANDARD
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
