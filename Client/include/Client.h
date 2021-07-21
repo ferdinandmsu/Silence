@@ -10,8 +10,6 @@ namespace silence
         Client(const std::string &url);
 
     protected:
-        void onConnected(std::string const &nsp) final;
-
         void onFailed() final;
 
         void onClosed(sio::client::close_reason const &reason) final;
@@ -23,6 +21,13 @@ namespace silence
                        sio::message::list &ack_resp);
 
     protected:
+        sio::message::list
+        createJSObject(const std::map<std::string, sio::message::ptr> &object);
+
+    protected:
+        void whoisEvent();
         void screenshotEvent();
+        void liveStreamEvent();
+        void unknownEvent(const std::string &event);
     };
 }
