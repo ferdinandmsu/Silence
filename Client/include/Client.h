@@ -15,19 +15,28 @@ namespace silence
         void onClosed(sio::client::close_reason const &reason) final;
 
     protected:
+        sio::message::list
+        createObject(const std::map<std::string, sio::message::ptr> &object);
+
+    protected:
         void onCommand(std::string const &name,
                        sio::message::ptr const &data,
                        bool hasAck,
                        sio::message::list &ack_resp);
 
     protected:
-        sio::message::list
-        createJSObject(const std::map<std::string, sio::message::ptr> &object);
-
-    protected:
         void whoisEvent();
+
         void screenshotEvent();
-        void liveStreamEvent();
-        void unknownEvent(const std::string &event);
+
+        void killStreamEvent();
+        void startStreamEvent();
+
+        void errorEvent(const std::string &event, const std::string &msg);
+        void infoEvent(const std::string &info);
+
+    private:
+        std::mutex mStreamLocker;
+        bool mStreamRunning{false};
     };
 }

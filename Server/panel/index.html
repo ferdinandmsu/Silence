@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Socket.IO chat</title>
+</head>
+
+<body>
+
+    <img id="dataImage">
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+        var socket = io();
+        let lastFrameTime = Date.now()
+
+        socket.on('streamFrame', function (image) {
+            console.log(1 / ((Date.now() - lastFrameTime) / 1000))
+            let imageElement = document.getElementById("dataImage");
+            imageElement.src = `data:image/jpeg;base64,${image}`
+            lastFrameTime = Date.now()
+        });
+
+    </script>
+</body>
+
+</html>

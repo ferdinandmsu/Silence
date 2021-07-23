@@ -18,13 +18,13 @@ namespace silence
     BaseClient::BaseClient(const std::string &url)
         : mUrl(url), mIO(new sio::client())
     {
-        mSock = mIO->socket();
+        mSocket = mIO->socket();
     }
 
     BaseClient::~BaseClient()
     {
-        mIO->socket()->off_all();
-        mIO->socket()->off_error();
+        mSocket->off_all();
+        mSocket->off_error();
     }
 
     void BaseClient::connect()
@@ -41,7 +41,7 @@ namespace silence
     void BaseClient::bindEvent(const std::string &event,
                                const EventFunction &callback)
     {
-        BIND_EVENT(mIO->socket(), event, callback);
+        BIND_EVENT(mSocket, event, callback);
     }
 
     void BaseClient::onConnected(std::string const &nsp)

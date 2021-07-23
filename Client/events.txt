@@ -1,0 +1,12 @@
+[server events]
+    - screenshot
+    - start_stream
+    - kill_stream
+    - whois
+
+[client events]
+    - error         [*]
+    - info          [*]
+    - screenshot    [screenshot]
+    - frame         [start_stream]
+    - system        [whois]
