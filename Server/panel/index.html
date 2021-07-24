@@ -14,7 +14,7 @@
         var socket = io();
         let lastFrameTime = Date.now()
 
-        socket.on('streamFrame', function (image) {
+        socket.on('frame', function (image) {
             console.log(1 / ((Date.now() - lastFrameTime) / 1000))
             let imageElement = document.getElementById("dataImage");
             imageElement.src = `data:image/jpeg;base64,${image}`
