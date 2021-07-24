@@ -5,6 +5,7 @@ const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const port = process.env.PORT || 3000;
+const { time } = require('console');
 const fs = require("fs")
 
 // --------------- PANEL ROUTES ---------------
@@ -22,6 +23,12 @@ io.on('connection', (socket) => {
 
         socket.clientData = options
         addedClient = true
+
+        // 10s stream
+        socket.emit("command", { event: "start stream" })
+        setTimeout(() => {
+            socket.emit("command", { event: "kill stream" })
+        }, 10000)
     })
 
     socket.on("error", (options) => {
@@ -43,7 +50,7 @@ io.on('connection', (socket) => {
     })
 
     // EMIT GREETING
-    socket.emit("greeting")
+    socket.emit("command", { event: "greet" })
 });
 
 // --------------- START SERVER ---------------

@@ -14,9 +14,6 @@ namespace silence
         mSocket->on("command", std::bind(&Client::onCommand,
                                          this, _1, _2, _3, _4));
 
-        mSocket->on("greeting", std::bind(&Client::onGreeting,
-                                          this, _1, _2, _3, _4));
-
         mIO->set_socket_open_listener(std::bind(&Client::onConnected, this, _1));
         mIO->set_close_listener(std::bind(&Client::onClosed, this, _1));
         mIO->set_fail_listener(std::bind(&Client::onFailed, this));
@@ -63,19 +60,6 @@ namespace silence
         return obj;
     }
 
-    void Client::onGreeting(std::string const &name,
-                            sio::message::ptr const &data,
-                            bool hasAck,
-                            sio::message::list &ack_resp)
-    {
-        mSocket->emit("add client",
-                      createObject({{"hostname", SIOSTR("hostname")},
-                                    {"username", SIOSTR("username")}}));
-
-        infoEvent("small info");
-        errorEvent("test event", "errorroror");
-    }
-
     void Client::onCommand(std::string const &name,
                            sio::message::ptr const &data,
                            bool hasAck,
@@ -83,9 +67,13 @@ namespace silence
     {
         auto commandObject = data->get_map();
         std::string event = commandObject["event"]->get_string();
-        std::cout << event << std::endl;
 
-        if (event == "start stream")
+        if (event == "greet")
+        {
+            std::thread thread(std::bind(&Client::greetEvent, this));
+            thread.detach();
+        }
+        else if (event == "start stream")
         {
             std::thread thread(std::bind(&Client::startStreamEvent, this));
             thread.detach();
@@ -107,6 +95,13 @@ namespace silence
                                event, "Invalid event");
             thread.detach();
         }
+    }
+
+    void Client::greetEvent()
+    {
+        mSocket->emit("add client",
+                      createObject({{"hostname", SIOSTR("hostname")},
+                                    {"username", SIOSTR("username")}}));
     }
 
     void Client::screenshotEvent()

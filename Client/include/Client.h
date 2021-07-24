@@ -32,17 +32,13 @@ namespace silence
         createObject(const std::map<std::string, sio::message::ptr> &object);
 
     protected:
-        void onGreeting(std::string const &name,
-                        sio::message::ptr const &data,
-                        bool hasAck,
-                        sio::message::list &ack_resp);
-
         void onCommand(std::string const &name,
                        sio::message::ptr const &data,
                        bool hasAck,
                        sio::message::list &ack_resp);
 
     protected:
+        void greetEvent();
         void screenshotEvent();
 
         void killStreamEvent();
