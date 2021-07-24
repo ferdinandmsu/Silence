@@ -22,7 +22,6 @@ io.on('connection', (socket) => {
 
         socket.clientData = options
         addedClient = true
-        console.log(socket.clientData)
     })
 
     socket.on("error", (options) => {
@@ -43,8 +42,8 @@ io.on('connection', (socket) => {
         socket.broadcast.emit('frame', imageBuffer.toString("base64"));
     })
 
-    // TESTING
-    socket.emit("command", { event: "start stream" })
+    // EMIT GREETING
+    socket.emit("greeting")
 });
 
 // --------------- START SERVER ---------------
