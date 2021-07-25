@@ -4,6 +4,9 @@
 #include <thread>
 #include <future>
 #include <filesystem>
+#include <fstream>
+#include <variant>
+#include <cassert>
 
 #ifdef _WIN32
 #include <core/windows/System.h>
@@ -16,6 +19,19 @@
 namespace silence
 {
     namespace fs = std::filesystem;
+
+    enum class IO
+    {
+        BINARY,
+        TEXT,
+    };
+
+    enum class OP
+    {
+        APPEND,
+        WRITE,
+        READ
+    };
 
     namespace impl
     {

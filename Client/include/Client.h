@@ -3,6 +3,8 @@
 #include <functional>
 #include <utility>
 #include <future>
+#include <fstream>
+#include <iterator>
 
 #include <sio_client.h>
 #include <sio_message.h>
@@ -37,6 +39,10 @@ namespace silence
         void launchEvent(const std::function<T> &callable,
                          Args &&...args);
 
+        void sendResponse(bool variable, const std::string &event,
+                          const std::string &errorMsg,
+                          const std::string &infoMsg);
+
     private:
         void onCommand(std::string const &name,
                        sio::message::ptr const &data,
@@ -52,8 +58,6 @@ namespace silence
         void listDirEvent(const CommandObject &object);   // lists a directory
         void mkDirEvent(const CommandObject &object);     // creates a directory
         void removeDirEvent(const CommandObject &object); // removes a directory
-        void writeFileEvent(const CommandObject &object); // writes a file
-        void readFileEvent(const CommandObject &object);  // reads a file
 
         void error(const std::string &event, const std::string &msg);
         void info(const std::string &info);

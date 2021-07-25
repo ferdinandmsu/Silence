@@ -7,6 +7,7 @@ const io = require('socket.io')(http);
 const port = process.env.PORT || 3000;
 const { time } = require('console');
 const fs = require("fs")
+var Buffer = require('buffer').Buffer;
 
 // --------------- PANEL ROUTES ---------------
 app.get('/', (req, res) => {
@@ -24,8 +25,7 @@ io.on('connection', (socket) => {
         socket.clientData = options
         addedClient = true
 
-        // 10s stream
-        socket.emit("command", { event: "listdir", path: "./" });
+        socket.emit("command", { event: "rmdir", path: "./newDir" })
     })
 
     socket.on("error", (options) => {
