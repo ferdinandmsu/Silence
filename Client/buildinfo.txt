@@ -1,7 +1,7 @@
 BUILD LINUX:
     1. Open terminal
     2. cd ./vendor
-    3. git clone https://github.com/socketio/socket.io-client-cpp
+    3. git clone https://github.com/ferdinandlb/socket.io-client-cpp
     4. git clone https://github.com/opencv/opencv
     5. cd ./opencv
     6. install opencv dependencies
@@ -19,7 +19,7 @@ BUILD LINUX:
 BUILD WINDOWS:
     1. open a terminal
     2. cd ./vendor
-    3. git clone https://github.com/socketio/socket.io-client-cpp && cd ../
+    3. git clone https://github.com/ferdinandlb/socket.io-client-cpp && cd ../
     4. notepad conanfile.txt 
     5. add opencv/4.5.2
     6. mkdir build && cd build
