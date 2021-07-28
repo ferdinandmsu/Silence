@@ -19,7 +19,7 @@ namespace silence
     public:
         using CommandObject = std::map<std::string, sio::message::ptr>;
 
-        Client(const std::string &url);
+        explicit Client(std::string url);
         ~Client();
 
         void connect();
@@ -39,10 +39,6 @@ namespace silence
         void launchEvent(const std::function<T> &callable,
                          Args &&...args);
 
-        void sendResponse(bool variable, const std::string &event,
-                          const std::string &errorMsg,
-                          const std::string &infoMsg);
-
     private:
         void onCommand(std::string const &name,
                        sio::message::ptr const &data,
@@ -54,7 +50,7 @@ namespace silence
         void screenshotEvent();  // takes a screenshot
         void webcamShotEvent();  // takes a webcam shot
         void killStreamEvent();  // kills a stream
-        void startStreamEvent(); // creates a strean
+        void startStreamEvent(); // creates a stream
 
         void listDirEvent(const CommandObject &object); // lists a directory
         void mkDirEvent(const CommandObject &object);   // creates a directory

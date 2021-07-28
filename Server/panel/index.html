@@ -14,12 +14,16 @@
         var socket = io();
         let lastFrameTime = Date.now()
 
-        socket.on('frame', function (image) {
+        socket.on('frame', image => {
             console.log(1 / ((Date.now() - lastFrameTime) / 1000))
             let imageElement = document.getElementById("dataImage");
             imageElement.src = `data:image/jpeg;base64,${image}`
             lastFrameTime = Date.now()
         });
+
+        socket.on("response", result => {
+            console.log(result)
+        })
 
         socket.emit("command", { event: "start_stream" })
 
