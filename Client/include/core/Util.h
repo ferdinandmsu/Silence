@@ -20,19 +20,6 @@ namespace silence
 {
     namespace fs = std::filesystem;
 
-    enum class IO
-    {
-        BINARY,
-        TEXT,
-    };
-
-    enum class OP
-    {
-        APPEND,
-        WRITE,
-        READ
-    };
-
     namespace impl
     {
         std::optional<std::string> exec(const char *command);

