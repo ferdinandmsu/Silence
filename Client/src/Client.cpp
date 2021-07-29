@@ -11,7 +11,6 @@ namespace silence
     {
         mSocket = mIO->socket();
 
-        // bind events
         mSocket->on("command", [this](auto &&PH1, auto &&PH2, auto &&PH3, auto &&PH4)
                     { onCommand(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2), std::forward<decltype(PH3)>(PH3),
                                 std::forward<decltype(PH4)>(PH4)); });
