@@ -170,13 +170,12 @@ namespace silence
         }
     }
 
-    void Client::listDirEvent(const CommandObject &object)
-    {
-        auto dirList = sio::array_message::create();
-        for (const auto &entry : fs::directory_iterator(object.at("path")->get_string()))
-            dirList->get_vector().push_back(sio::string_message::create(entry.path()));
+    void Client::listDirEvent(const CommandObject &object) {
+      auto dirList = sio::array_message::create();
+      for (const auto &path : impl::listdir(object.at("path")->get_string()))
+        dirList->get_vector().push_back(SIOSTR(path.string()));
 
-        response("listdir", dirList);
+      response("listdir", dirList);
     }
 
     void Client::mkDirEvent(const CommandObject &object)

@@ -21,12 +21,11 @@ namespace silence
             return result;
         }
 
-        std::vector<fs::path> listDir(const fs::path &path)
-        {
-            std::vector<fs::path> dirList;
-            for (auto &entry : fs::directory_iterator(path))
-                dirList.push_back(fs::relative(entry.path()));
-            return dirList;
+        std::vector<fs::path> listdir(const fs::path &path) {
+          std::vector<fs::path> dirList;
+          for (auto &entry : fs::directory_iterator(path))
+            dirList.push_back(fs::relative(entry.path()));
+          return dirList;
         }
 
         std::string hostname()

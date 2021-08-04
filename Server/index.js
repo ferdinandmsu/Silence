@@ -9,10 +9,7 @@ const port = process.env.PORT || 3000;
 const fs = require("fs")
 
 // --------------- VARIABLES ---------------
-app.get("/", (req, res) => {
-    res.sendFile(__dirname + "/panel/index.html")
-    console.log(__dirname + "/panel/index.html")
-})
+app.use("/", express.static(__dirname + "/panel"))
 
 // --------------- SOCKIO CONNECTION ---------------
 io.on('connection', (socket) => {
