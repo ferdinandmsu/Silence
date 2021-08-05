@@ -9,6 +9,8 @@ const port = process.env.PORT || 3000;
 const fs = require("fs")
 
 // --------------- VARIABLES ---------------
+let allClients = []
+
 app.use("/", express.static(__dirname + "/panel"))
 
 // --------------- SOCKIO CONNECTION ---------------
@@ -16,11 +18,12 @@ io.on('connection', (socket) => {
     let addedClient = false
 
     // --------------- CLIENT FUNCTIONS ---------------
-    socket.on("add client", (options) => {
+    socket.on("add_client", (options) => {
         if (addedClient) return
 
         socket.clientData = options
         addedClient = true
+        allClients.push(socket.clientData)
     })
 
     socket.on("response", (data) => {
@@ -46,7 +49,12 @@ io.on('connection', (socket) => {
         socket.broadcast.emit("command", options)
     })
 
-    socket.emit("command", { event: "greet" })
+    socket.on("get_data", (ack) => {
+        if (ack)
+            ack(allClients)
+    })
+
+    socket.emit("command", {event: "greet"})
 });
 
 
