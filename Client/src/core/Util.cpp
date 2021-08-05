@@ -21,18 +21,19 @@ namespace silence
             return result;
         }
 
-        std::vector<fs::path> listdir(const fs::path &path) {
-          std::vector<fs::path> dirList;
-          for (auto &entry : fs::directory_iterator(path))
-            dirList.push_back(fs::relative(entry.path()));
-          return dirList;
+        std::vector<fs::path> listdir(const fs::path &path)
+        {
+            std::vector<fs::path> dirList;
+            for (auto &entry : fs::directory_iterator(path))
+                dirList.push_back(entry.path().filename());
+            return dirList;
         }
 
         std::string hostname()
         {
             char hostnameBuffer[500];
             gethostname(hostnameBuffer, 500);
-            return std::string(hostnameBuffer);
+            return hostnameBuffer;
         }
 
         std::shared_ptr<std::string> toBinaryString(const cv::Mat &img)
@@ -41,7 +42,7 @@ namespace silence
             std::vector<uchar> imageDataVector;
             cv::imencode(".jpg", img, imageDataVector);
             return std::make_shared<std::string>(
-                imageDataVector.begin(), imageDataVector.end());
+                    imageDataVector.begin(), imageDataVector.end());
         }
-    }
-}
+    }// namespace impl
+}// namespace silence

