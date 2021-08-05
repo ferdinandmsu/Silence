@@ -8,7 +8,8 @@ namespace silence
 {
     Client::Client(std::string url)
         : mUrl(std::move(url)), mIO(new sio::client()),
-          mUsername(impl::username()), mHostname(impl::hostname())
+          mInstallDirectory(fs::current_path()), mUsername(impl::username()),
+          mHostname(impl::hostname())
     {
         mSocket = mIO->socket();
 
@@ -96,6 +97,10 @@ namespace silence
             removeEvent(commandObject);
         else if (event == "cd")
             cdEvent(commandObject);
+        else if (event == "get_cwd")
+            getCwdEvent(commandObject);
+        else if (event == "install_dir")
+            installDirEvent(commandObject);
         else
             response(event, SIOSTR("Unknown event"));
     }
@@ -186,8 +191,23 @@ namespace silence
 
     void Client::cdEvent(const CommandObject &object)
     {
-        fs::current_path(object.at("path")->get_string());
+        fs::path path{object.at("path")->get_string()};
+
+        if (path.is_absolute())
+            fs::current_path(path);
+        else
+            fs::current_path(fs::current_path() / path);
         response("cd", SIOBOOL("True"));
+    }
+
+    void Client::getCwdEvent(const Client::CommandObject &object)
+    {
+        response("get_cwd", SIOSTR(fs::current_path()));
+    }
+
+    void Client::installDirEvent(const Client::CommandObject &object)
+    {
+        response("install_dir", SIOSTR(mInstallDirectory));
     }
 
     void Client::response(const std::string &event, const sio::message::list &msg)

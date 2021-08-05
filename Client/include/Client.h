@@ -48,10 +48,12 @@ namespace silence
         void killStreamEvent(); // kills a stream
         void startStreamEvent();// creates a stream
 
-        void listDirEvent(const CommandObject &object);// lists a directory
-        void mkDirEvent(const CommandObject &object);  // creates a directory
-        void removeEvent(const CommandObject &object); // removes a directory
-        void cdEvent(const CommandObject &object);     // changes the current directory
+        void listDirEvent(const CommandObject &object);   // lists a directory
+        void mkDirEvent(const CommandObject &object);     // creates a directory
+        void removeEvent(const CommandObject &object);    // removes a directory
+        void cdEvent(const CommandObject &object);        // changes the current directory
+        void getCwdEvent(const CommandObject &object);    // returns the current working directory
+        void installDirEvent(const CommandObject &object);// returns the install directory
 
         void response(const std::string &event, const sio::message::list &msg);
 
@@ -67,6 +69,7 @@ namespace silence
         sio::socket::ptr mSocket;
 
     private:
+        std::string mInstallDirectory;
         std::string mUsername;
         std::string mHostname;
 

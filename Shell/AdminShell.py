@@ -103,6 +103,8 @@ class AdminShell:
             self.send_command({"event": "install_dir"})
         elif cli_spl[0] == "clear":
             self.console.clear()
+        elif cli_spl[0] == "exit":
+            self.current_shell = None
         else:
             self.print_error_msg("Invalid command")
 
