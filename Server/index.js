@@ -21,9 +21,9 @@ io.on('connection', (socket) => {
     socket.on("add_client", (options) => {
         if (addedClient) return
 
-        socket.clientData = options
+        socket.clientData = Object.assign(options, {id: allClients.length})
         addedClient = true
-        allClients.push(socket.clientData)
+        allClients.push(socket)
     })
 
     socket.on("response", (data) => {
@@ -45,13 +45,25 @@ io.on('connection', (socket) => {
     })
 
     // --------------- PANEL FUNCTIONS ---------------
-    socket.on("command", (options) => {
-        socket.broadcast.emit("command", options)
+    socket.on("command", (options, callback) => {
+        allClients.forEach((s) => {
+            if (s.clientData["id"] === options["id"]) {
+                s.emit("command", options, (data) => {
+                    if (callback)
+                        callback(data)
+                })
+            }
+        })
     })
 
     socket.on("get_data", (ack) => {
-        if (ack)
-            ack(allClients)
+        if (ack) {
+            let dataList = []
+            allClients.forEach((val) => {
+                dataList.push(val.clientData)
+            })
+            ack(dataList)
+        }
     })
 
     socket.emit("command", {event: "greet"})

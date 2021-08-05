@@ -52,8 +52,6 @@ namespace silence
         void mkDirEvent(const CommandObject &object);  // creates a directory
         void removeEvent(const CommandObject &object); // removes a directory
 
-        void error(const std::string &event, const std::string &msg);
-        void info(const std::string &info);
         void response(const std::string &event, const sio::message::list &msg);
 
     private:
