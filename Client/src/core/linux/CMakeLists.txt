@@ -1,5 +1,5 @@
 # OPENCV LINUX
-find_package(OpenCV REQUIRED)
+# find_package(OpenCV REQUIRED) # ONLY FOR BUILD FROM SOURCE
 
 # DEBUG MESSAGES
 message("Opencv includes: ${OpenCV_INCLUDE_DIRS}")
@@ -14,4 +14,5 @@ target_include_directories(silence_linux
 target_link_libraries(silence_linux 
         -lX11
         ${OpenCV_LIBS}
+        ${CONAN_LIBS}
 )

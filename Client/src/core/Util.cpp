@@ -6,7 +6,7 @@ namespace silence
     {
         std::optional<std::string> exec(const char *command)
         {
-            std::array<char, 128> buffer;
+            std::array<char, 128> buffer{};
             std::string result;
 #ifdef _WIN32
             std::unique_ptr<FILE, decltype(&_pclose)> pipe(_popen(command, "r"), _pclose);
