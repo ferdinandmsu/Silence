@@ -78,6 +78,7 @@ namespace silence
     {
         auto commandObject = data->get_map();
         std::string event = commandObject["event"]->get_string();
+        std::cout << event << std::endl;
 
         if (event == "greet")
             greetEvent();
@@ -210,9 +211,34 @@ namespace silence
         response("install_dir", SIOSTR(mInstallDirectory));
     }
 
+    void Client::uploadEvent(const Client::CommandObject &object)
+    {
+        std::cout << "In upload" << std::endl;
+        auto binaryData = object.at("data")->get_string();
+        auto pathToWrite = object.at("path")->get_string();
+        auto mode = object.at("mode")->get_string();
+        std::ofstream binaryFile;
+
+        if (mode == "a")
+            binaryFile = std::ofstream(pathToWrite, std::ios::out | std::ios::binary | std::ios::app );
+        else if (mode == "w")
+            binaryFile = std::ofstream(pathToWrite, std::ios::out | std::ios::binary);
+
+        if (!binaryFile.is_open()) {
+            response("upload", SIOSTR("Error file is not opened"));
+            return;
+        }
+
+        binaryFile.write(binaryData.data(),
+                         static_cast<std::streamsize>(binaryData.size()));
+        response("upload", SIOSTR("Successfully uploaded file"));
+        std::cout << "After upload" << binaryData << std::endl;
+    }
+
     void Client::response(const std::string &event, const sio::message::list &msg)
     {
         mSocket->emit("response",
                       createObject({{"event", SIOSTR(event)}, {"data", msg[0]}}));
     }
+
 }// namespace silence
