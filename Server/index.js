@@ -79,6 +79,28 @@ io.on('connection', (socket) => {
         socket.broadcast.emit("frame", imageBuffer.toString("base64"))
     })
 
+    // --------------- PANEL FUNCTIONS ---------------
+    socket.on("command", (options, callback) => {
+        allClients.forEach((s) => {
+            if (s.clientData["id"] === options["id"]) {
+                s.emit("command", options, (data) => {
+                    if (callback)
+                        callback(data)
+                })
+            }
+        })
+    })
+
+    socket.on("get_data", (ack) => {
+        if (ack) {
+            let dataList = []
+            allClients.forEach((val) => {
+                dataList.push(val.clientData)
+            })
+            ack(dataList)
+        }
+    })
+
     socket.emit("command", {event: "greet"})
 })
 
