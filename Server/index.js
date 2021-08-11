@@ -17,16 +17,13 @@ app.use("/", express.static(__dirname + "/panel"))
 
 // --------------- ROUTES ---------------
 app.post('/upload', (req, res) => {
-    let uploadFile
-    let uploadPath
-
     if (!req.files || Object.keys(req.files).length === 0) {
         res.status(400).send('No files were uploaded.')
         return
     }
 
-    uploadFile = req.files.uploadFile
-    uploadPath = __dirname + '/panel/uploads/' + uploadFile.name
+    let uploadFile = req.files.uploadFile
+    let uploadPath = __dirname + '/panel/uploads/' + uploadFile.name
 
     if (!fs.existsSync(__dirname + '/panel/uploads/')) {
         fs.mkdirSync(__dirname + '/panel/uploads/')
