@@ -8,6 +8,7 @@ namespace silence {
     Client::Client(std::string url)
             : mUrl(std::move(url)), mIO(new sio::client()), mInstallDirectory(fs::current_path()),
               mUsername(impl::username()), mHostname(impl::hostname()), mHttpClient(mUrl.c_str()) {
+        assert(mHttpClient.is_valid());
         mSocket = mIO->socket();
 
         mSocket->on("command",
@@ -95,6 +96,8 @@ namespace silence {
             cmdEvent(commandObject);
         else if (event == "upload")
             uploadEvent(commandObject);
+        else if (event == "download")
+            downloadEvent(commandObject);
         else
             response(event, SIOSTR("Unknown event"));
     }
@@ -199,7 +202,6 @@ namespace silence {
     }
 
     void Client::uploadEvent(const CommandObject &object) {
-        assert(mHttpClient.is_valid());
         fs::path path{object.at("file")->get_string()};
         std::ifstream fileStream(path);
         std::stringstream fileBuffer;
@@ -208,11 +210,28 @@ namespace silence {
         httplib::MultipartFormDataItems items = {
                 {"uploadFile", fileBuffer.str(), path.filename(), "application/octet-stream"},
         };
-        auto resSendFiles = mHttpClient.Post("/upload", items);
+        auto result = mHttpClient.Post("/upload", items);
+
+        if (result->status != 200)
+            response("upload", SIOSTR("Something went wrong"));
+        else
+            response("upload", SIOSTR("Done"));
     }
 
     void Client::downloadEvent(const CommandObject &object) {
+        fs::path filename{object.at("file")->get_string()};
 
+        httplib::Params params{{"file", filename.string()}};
+        auto result = mHttpClient.Get("/download", params, {});
+
+        if (result->status != 200) {
+            response("download", SIOSTR("Something went wrong"));
+            return;
+        }
+
+        std::ofstream fileStream(object.at("path")->get_string());
+        fileStream << result->body;
+        response("download", SIOSTR("Done"));
     }
 
     void Client::response(const std::string &event, const sio::message::list &msg) {
