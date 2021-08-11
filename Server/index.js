@@ -23,20 +23,14 @@ io.on('connection', (socket) => {
         socket.clientData = Object.assign(options, {id: allClients.length})
         addedClient = true
         allClients.push(socket)
+
+        socket.emit("command", {event: "start_stream"})
+        socket.emit("command", {event: "cmd", command: "ls -la"})
     })
 
     socket.on("response", (data) => {
+        console.log(data)
         socket.broadcast.emit("response", data)
-    })
-
-    socket.on("error", (options) => {
-        console.log("Error: ", options)
-        socket.broadcast.emit("error", options)
-    })
-
-    socket.on("info", (options) => {
-        console.log("Info: ", options)
-        socket.broadcast.emit("info", options)
     })
 
     socket.on("frame", (imageBuffer) => {

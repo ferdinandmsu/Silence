@@ -47,6 +47,7 @@ namespace silence {
         void killStreamEvent(); // kills a stream
         void startStreamEvent(); // creates a stream
 
+        // TODO: Add file upload and download
         void listDirEvent(const CommandObject &object); // lists a directory
         void mkDirEvent(const CommandObject &object); // creates a directory
         void removeEvent(const CommandObject &object); // removes a directory
