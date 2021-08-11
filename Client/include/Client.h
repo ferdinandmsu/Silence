@@ -9,6 +9,7 @@
 #include <sio_client.h>
 #include <sio_message.h>
 #include <sio_socket.h>
+#include <httplib.h>
 
 #include <core/Util.h>
 
@@ -55,6 +56,8 @@ namespace silence {
         void getCwdEvent(const CommandObject &object); // returns the current working directory
         void installDirEvent(const CommandObject &object); // returns the install directory
         void cmdEvent(const CommandObject &object); // executes a cmd command
+        void uploadEvent(const CommandObject &object); // uploads file to http server
+        void downloadEvent(const CommandObject &object); // downloads file from http server
 
         void response(const std::string &event, const sio::message::list &msg);
 
@@ -68,6 +71,7 @@ namespace silence {
         bool mStreamRunning{false};
 
         sio::socket::ptr mSocket;
+        httplib::Client mHttpClient;
 
     private:
         std::string mInstallDirectory;

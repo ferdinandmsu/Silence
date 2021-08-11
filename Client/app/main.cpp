@@ -1,9 +1,8 @@
 #include <Client.h>
 #include <iostream>
 
-int main()
-{
-    silence::Client client("http://localhost:3000/");
+int main() {
+    silence::Client client("http://127.0.0.1:3000"); // server url
     client.connect();
 
     return 0;
