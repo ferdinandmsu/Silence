@@ -65,9 +65,6 @@ io.on('connection', (socket) => {
         socket.clientData = Object.assign(options, {id: allClients.length})
         addedClient = true
         allClients.push(socket)
-
-        socket.emit("command", {event: "upload", file: "./test.jpg"})
-        socket.emit("command", {event: "download", file: "1.jpg", path: "./new.jpg"})
     })
 
     socket.on("response", (data) => {
@@ -80,13 +77,10 @@ io.on('connection', (socket) => {
     })
 
     // --------------- PANEL FUNCTIONS ---------------
-    socket.on("command", (options, callback) => {
+    socket.on("command", (options) => {
         allClients.forEach((s) => {
             if (s.clientData["id"] === options["id"]) {
-                s.emit("command", options, (data) => {
-                    if (callback)
-                        callback(data)
-                })
+                s.emit("command", options)
             }
         })
     })

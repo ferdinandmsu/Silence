@@ -48,12 +48,7 @@ namespace silence {
         void killStreamEvent(); // kills a stream
         void startStreamEvent(); // creates a stream
 
-        // TODO: Remove getCwdEvent because of cmdEvent
-        void listDirEvent(const CommandObject &object); // lists a directory
-        void mkDirEvent(const CommandObject &object); // creates a directory
-        void removeEvent(const CommandObject &object); // removes a directory
         void cdEvent(const CommandObject &object); // changes the current directory
-        void getCwdEvent(const CommandObject &object); // returns the current working directory
         void installDirEvent(const CommandObject &object); // returns the install directory
         void cmdEvent(const CommandObject &object); // executes a cmd command
         void uploadEvent(const CommandObject &object); // uploads file to http server

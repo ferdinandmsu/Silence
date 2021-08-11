@@ -85,12 +85,6 @@ class Shell:
 
         if cli_spl[0] == "help":
             self.console.print(SHELL_HELP)
-        elif cli_spl[0] == "mkdir":
-            self.send_command({"event": "mkdir", "path": cli_spl[1]})
-        elif cli_spl[0] == "listdir":
-            self.send_command({"event": "listdir", "path": cli_spl[1]})
-        elif cli_spl[0] == "remove":
-            self.send_command({"event": "remove", "path": cli_spl[1]})
         elif cli_spl[0] == "start_stream":
             self.send_command({"event": "start_stream"})
         elif cli_spl[0] == "kill_stream":
