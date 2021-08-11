@@ -92,8 +92,8 @@ class Shell:
             self.send_command({"event": "kill_stream"})
         elif cli_spl[0] == "cd":
             self.send_command({"event": "cd", "path": cli_spl[1]})
-        elif cli_spl[0] == "install_dir":
-            self.send_command({"event": "install_dir"})
+        elif cli_spl[0] == "origin":
+            self.send_command({"event": "origin"})
         elif cli_spl[0] == "download":
             self.send_command({"event": "download", "file": os.path.basename(cli_spl[1]), "path": cli_spl[2]})
         elif cli_spl[0] == "upload":

