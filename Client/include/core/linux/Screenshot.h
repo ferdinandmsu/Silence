@@ -10,26 +10,21 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 
-namespace silence
-{
-    namespace impl
-    {
-        class Screenshot
-        {
-            Display *display;
-            Window root;
-            int x{0}, y{0}, width{1920}, height{1080};
-            XImage *img{nullptr};
+namespace silence::impl {
+    class Screenshot {
+        Display *display;
+        Window root;
+        int x{0}, y{0}, width{1920}, height{1080};
+        XImage *img{nullptr};
 
-        public:
-            Screenshot();
-            ~Screenshot();
+    public:
+        Screenshot();
 
-        public:
-            cv::Mat take();
-        };
+        ~Screenshot();
 
-    }
+    public:
+        cv::Mat take();
+    };
 }
 
 #endif

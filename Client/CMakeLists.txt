@@ -2,14 +2,14 @@
 cmake_minimum_required(VERSION 3.19)
 
 # PROJECT
-project(SilenceClient 
-        VERSION 1.0.0 
+project(SilenceClient
+        VERSION 1.0.0
         LANGUAGES CXX)
 
 # WINDOWS
 if (WIN32)
     add_definitions(-D_ITERATOR_DEBUG_LEVEL=0)
-endif()
+endif ()
 
 # CXX STANDARD
 set(CMAKE_CXX_STANDARD 17)

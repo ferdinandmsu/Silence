@@ -11,12 +11,8 @@
 
 #include <unistd.h>
 
-namespace silence
-{
-    namespace impl
-    {
-        std::string username();
-    }
+namespace silence::impl {
+    std::string username();
 }
 
 #endif

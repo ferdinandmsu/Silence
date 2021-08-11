@@ -1,17 +1,14 @@
 #ifdef _WIN32
 #include <core/windows/System.h>
 
-namespace silence
+namespace silence::impl
 {
-    namespace impl
+    std::string username()
     {
-        std::string username()
-        {
-            char usernameBuffer[UNLEN + 1];
-            DWORD usernameLen = UNLEN + 1;
-            GetUserName(usernameBuffer, &usernameLen);
-            return std::string(usernameBuffer);
-        }
+        char usernameBuffer[UNLEN + 1];
+        DWORD usernameLen = UNLEN + 1;
+        GetUserName(usernameBuffer, &usernameLen);
+        return std::string(usernameBuffer);
     }
 }
 

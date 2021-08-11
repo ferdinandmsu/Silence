@@ -12,16 +12,16 @@
 #include <core/windows/System.h>
 #include <core/windows/Screenshot.h>
 #else
+
 #include <core/linux/System.h>
 #include <core/linux/Screenshot.h>
+
 #endif
 
-namespace silence
-{
+namespace silence {
     namespace fs = std::filesystem;
 
-    namespace impl
-    {
+    namespace impl {
         std::optional<std::string> exec(const char *command);
 
         std::vector<fs::path> listdir(const fs::path &path);

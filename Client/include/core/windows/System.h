@@ -15,12 +15,9 @@
 
 #pragma comment(lib, "ws2_32.lib")
 
-namespace silence
+namespace silence::impl
 {
-    namespace impl
-    {
-        std::string username();
-    }
+    std::string username();
 }
 
 #endif

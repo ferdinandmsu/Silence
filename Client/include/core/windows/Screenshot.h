@@ -4,19 +4,16 @@
 #include <opencv2/opencv.hpp>
 #include <Windows.h>
 
-namespace silence
+namespace silence::impl
 {
-    namespace impl
+    class Screenshot
     {
-        class Screenshot
-        {
-            HWND hwndDesktop;
+        HWND hwndDesktop;
 
-        public:
-            Screenshot();
-            cv::Mat take();
-        };
-    }
+    public:
+        Screenshot();
+        cv::Mat take();
+    };
 }
 
 #endif

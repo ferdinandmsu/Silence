@@ -1,14 +1,10 @@
 #ifdef __linux__
+
 #include <core/linux/System.h>
 
-namespace silence
-{
-    namespace impl
-    {
-        std::string username()
-        {
-            return std::string(getlogin());
-        }
+namespace silence::impl {
+    std::string username() {
+        return getlogin();
     }
 }
 

