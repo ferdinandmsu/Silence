@@ -17,13 +17,6 @@ namespace silence::impl {
         return result;
     }
 
-    std::vector<fs::path> listdir(const fs::path &path) {
-        std::vector<fs::path> dirList;
-        for (auto &entry : fs::directory_iterator(path))
-            dirList.push_back(entry.path().filename());
-        return dirList;
-    }
-
     std::string hostname() {
         char hostnameBuffer[500];
         gethostname(hostnameBuffer, 500);

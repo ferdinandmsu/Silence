@@ -24,8 +24,6 @@ namespace silence {
     namespace impl {
         std::optional<std::string> exec(const char *command);
 
-        std::vector<fs::path> listdir(const fs::path &path);
-
         std::string hostname();
 
         std::shared_ptr<std::string> toBinaryString(const cv::Mat &img);

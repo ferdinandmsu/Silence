@@ -25,14 +25,14 @@ namespace silence {
         void connect();
 
     private:
-        void onConnected(const std::string &nsp);
+        static void onConnected(const std::string &nsp);
 
-        void onFailed();
+        static void onFailed();
 
-        void onClosed(sio::client::close_reason const &reason);
+        static void onClosed(sio::client::close_reason const &reason);
 
     private:
-        sio::message::list createObject(const CommandObject &object);
+        static sio::message::list createObject(const CommandObject &object);
 
         template<typename T, typename... Args>
         void launchEvent(const std::function<T> &callable, Args &&... args);
