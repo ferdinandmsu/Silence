@@ -13,17 +13,13 @@ HELP = """Commands:
 """
 
 SHELL_HELP = """Commands:
-    mkdir [directory] - Creates a new directory
-    listdir [path] - Lists a directory
-    cwd - Returns the current working directory
-    install_dir - Returns the install directory
-    remove [any] - Removes a directory or file
-    start_stream - Starts a stream
-    kill_stream - Kills a stream
-    upload [file] [dest] - Uploads a file from the local upload directory
-    download [path] - Downloads a file from client to download directory
+    stream [cam/screen] - Starts a stream from the screen or the webcam
+    kstream - Kills the current stream
+    upload [file] - Uploads a file from client to server
+    download [file] [path] - Downloads a file from server to path on client side
     clear - Clears the console
     exit - Kills current shell
+    [...] - All cmd commands e.g mkdir, rmdir, ls, cd
 """
 
 
@@ -86,10 +82,10 @@ class Shell:
 
         if cli_spl[0] == "help":
             self.console.print(SHELL_HELP)
-        elif cli_spl[0] == "start_stream":
-            self.send_command({"event": "start_stream"})
-        elif cli_spl[0] == "kill_stream":
-            self.send_command({"event": "kill_stream"})
+        elif cli_spl[0] == "stream":
+            self.send_command({"event": "stream", "from_screen": cli_spl[1] != "cam"})
+        elif cli_spl[0] == "kstream":
+            self.send_command({"event": "kstream"})
         elif cli_spl[0] == "cd":
             self.send_command({"event": "cd", "path": cli_spl[1]})
         elif cli_spl[0] == "origin":

