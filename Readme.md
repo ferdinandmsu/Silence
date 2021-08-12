@@ -1,7 +1,3 @@
-# Silence
-
----
-
 ### 👾 Discover the darkness 👾
 
 Silence is a modern spyware / RAT with many features. Documenation and windows example are coming soon. This piece of
