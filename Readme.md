@@ -30,6 +30,8 @@ malware uses socket.io to communicate between client and server.<br>
 ---
 
 ![](./img2.png)
+<br>
+<br>
 ![](./img.png)
 
 ### 😈 Libraries 😈
