@@ -4,8 +4,10 @@
 
 ### 👾 Discover the darkness 👾
 
-Silence is a modern spyware with many features. Documenation and windows example are coming soon. <br>
-**NOTE: This project is for educational purposes only.**
+Silence is a modern spyware / RAT with many features. Documenation and windows example are coming soon. This piece of
+malware uses socket.io to communicate between client and server.<br>
+
+**_This project is for educational purposes only._**
 
 ---
 
