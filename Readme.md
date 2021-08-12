@@ -34,6 +34,8 @@ malware uses socket.io to communicate between client and server.<br>
 <br>
 ![](./img.png)
 
+---
+
 ### 😈 Libraries 😈
 
 - openCV
