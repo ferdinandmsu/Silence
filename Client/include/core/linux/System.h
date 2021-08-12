@@ -15,8 +15,6 @@
 
 namespace silence::impl {
     std::string username();
-
-    void persist();
 }
 
 #endif
