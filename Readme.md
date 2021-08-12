@@ -46,4 +46,5 @@ malware uses socket.io to communicate between client and server.<br>
 
 ### 📉 Planning 📉
 
-[Silence Planning](Silence%2004e2a61cb3264391865aa6fe4e1cbe17/Silence%20Planning%20a49814aa2b5248a0a1a3da7bad2b17a0.csv)
+- WebUI
+- Smaller client
