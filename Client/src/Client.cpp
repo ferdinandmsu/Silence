@@ -43,11 +43,14 @@ namespace silence {
     }
 
     void Client::onConnected(const std::string &nsp) {
-        // persist on target
+        // TODO: persist on target
         // impl::persist();
     }
 
-    void Client::onFailed() { exit(0); }
+    void Client::onFailed() {
+        // TODO: add cleanup
+        exit(0);
+    }
 
     void Client::onClosed(sio::client::close_reason const &reason) { exit(0); }
 
@@ -220,4 +223,4 @@ namespace silence {
                                     {"data", msg[0]}}));
     }
 
-} // namespace silence
+}

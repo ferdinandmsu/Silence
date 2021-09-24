@@ -24,10 +24,9 @@ namespace silence::impl {
     }
 
     std::shared_ptr<std::string> toBinaryString(const cv::Mat &img) {
-        //convert to bytes
         std::vector<uchar> imageDataVector;
         cv::imencode(".jpg", img, imageDataVector);
         return std::make_shared<std::string>(
                 imageDataVector.begin(), imageDataVector.end());
     }
-}// namespace silence
+}
